@@ -26,6 +26,30 @@
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+            document.getElementById(modalId).classList.add('flex');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.getElementById(modalId).classList.remove('flex');
+        }
+
+        function selectPlan(planName, price) {
+            document.getElementById('checkout-plan-name').innerText = planName;
+            document.getElementById('checkout-plan-price').innerText = price;
+            openModal('modal-checkout');
+        }
+
+        function handleFormSubmit(event, message) {
+            event.preventDefault();
+            alert(message);
+            closeModal('modal-login');
+            closeModal('modal-register');
+            closeModal('modal-checkout');
+        }
     </script>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
@@ -35,7 +59,7 @@
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
                 <div class="bg-orange-500 p-2 rounded-lg text-white font-bold text-xl flex items-center justify-center w-9 h-9">
-                    <i class="fa-solid me-0.5 fa-chart-line"></i>
+                    <i class="fa-solid fa-chart-line me-0.5"></i>
                 </div>
                 <span class="text-xl font-bold tracking-tight text-white">GrowthPulse</span>
             </div>
@@ -48,8 +72,8 @@
             </nav>
 
             <div class="flex items-center gap-4">
-                <button onclick="navigateTo('pricing')" class="text-sm hover:text-white text-slate-300 hidden sm:block">Iniciar Sesión</button>
-                <button onclick="navigateTo('pricing')" class="bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm px-4 py-2 rounded-lg transition shadow-lg shadow-orange-500/20">
+                <button onclick="openModal('modal-login')" class="text-sm hover:text-white text-slate-300 hidden sm:block">Iniciar Sesión</button>
+                <button onclick="openModal('modal-register')" class="bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm px-4 py-2 rounded-lg transition shadow-lg shadow-orange-500/20">
                     Prueba Gratis
                 </button>
             </div>
@@ -61,7 +85,6 @@
 
         <!-- PÁGINA 1: INICIO -->
         <section id="home" class="page-view">
-            <!-- Hero -->
             <div class="max-w-5xl mx-auto text-center px-6 pt-20 pb-12">
                 <span class="bg-orange-500/10 text-orange-400 border border-orange-500/20 text-xs px-3 py-1.5 rounded-full font-medium inline-block mb-6">
                     Solución de Marketing Todo en Uno
@@ -70,10 +93,9 @@
                     El poder de los <span class="text-orange-500">Datos SEO</span> con la calidez del <span class="text-amber-400">Inbound CRM</span>
                 </h1>
                 <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-8">
-                    Atrae tráfico cualificado analizando a tu competencia y convierte cada visita en clientes satisfechos desde un solo panel.
+                    Atrae tráfico cualificado analizando a tu competencia y convierte cada visita en clientes satisfechos.
                 </p>
 
-                <!-- Buscador Interactivo -->
                 <div class="max-w-2xl mx-auto bg-slate-900 p-2 rounded-xl border border-slate-800 flex flex-col sm:flex-row gap-2 shadow-2xl">
                     <input type="text" placeholder="Ingresa tu sitio web o palabra clave..." class="bg-transparent px-4 py-3 text-sm text-white focus:outline-none flex-grow">
                     <button onclick="navigateTo('tools')" class="bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm px-6 py-3 rounded-lg transition flex items-center justify-center gap-2">
@@ -82,7 +104,6 @@
                 </div>
             </div>
 
-            <!-- Métricas Realistas Resumidas -->
             <div class="border-y border-slate-800 bg-slate-900/50 py-12">
                 <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                     <div>
@@ -112,36 +133,27 @@
                     <h2 class="text-3xl font-bold text-white mb-4">Herramientas Diseñadas para Crecer</h2>
                     <p class="text-slate-400">Combina análisis técnico profundo con herramientas amigables de relación con clientes.</p>
                 </div>
-
                 <div class="grid md:grid-cols-3 gap-8">
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-orange-500/50 transition">
                         <div class="w-12 h-12 bg-orange-500/10 text-orange-400 rounded-xl flex items-center justify-center mb-6 text-xl">
                             <i class="fa-solid fa-magnifying-glass-chart"></i>
                         </div>
                         <h3 class="text-xl font-bold text-white mb-3">SEO & Keyword Research</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-4">
-                            Descubre qué busca tu audiencia y analiza la estrategia de tu competencia paso a paso.
-                        </p>
+                        <p class="text-slate-400 text-sm leading-relaxed">Descubre qué busca tu audiencia y analiza la estrategia de tu competencia paso a paso.</p>
                     </div>
-
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-amber-500/50 transition">
                         <div class="w-12 h-12 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center mb-6 text-xl">
                             <i class="fa-solid fa-users"></i>
                         </div>
                         <h3 class="text-xl font-bold text-white mb-3">Inbound CRM</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-4">
-                            Organiza tus contactos, realiza seguimiento de oportunidades de venta y automatiza tus respuestas.
-                        </p>
+                        <p class="text-slate-400 text-sm leading-relaxed">Organiza tus contactos, realiza seguimiento de ventas y automatiza respuestas.</p>
                     </div>
-
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-emerald-500/50 transition">
                         <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center mb-6 text-xl">
                             <i class="fa-solid fa-envelope-open-text"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-3">Email Marketing & Nurturing</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-4">
-                            Diseña secuencias de correo automatizadas para acompañar a tus prospectos hasta la compra.
-                        </p>
+                        <h3 class="text-xl font-bold text-white mb-3">Email Marketing</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Diseña secuencias de correo automatizadas para acompañar a tus prospectos.</p>
                     </div>
                 </div>
             </div>
@@ -154,7 +166,6 @@
                     <h2 class="text-3xl font-bold text-white mb-4">Panel de Métricas en Tiempo Real</h2>
                     <p class="text-slate-400">Una vista previa de los informes que obtendrás con GrowthPulse.</p>
                 </div>
-
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
                     <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
                         <div>
@@ -163,19 +174,18 @@
                         </div>
                         <span class="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full font-medium">Salud Web: 92/100</span>
                     </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
                             <span class="text-xs text-slate-400">Tráfico Orgánico Est.</span>
                             <div class="text-2xl font-bold text-white mt-1">14,250 <span class="text-xs text-emerald-400 font-normal">+12%</span></div>
                         </div>
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
                             <span class="text-xs text-slate-400">Keywords Posicionadas</span>
-                            <div class="text-2xl font-bold text-white mt-1">1,840 <span class="text-xs text-emerald-400 font-normal">+85 este mes</span></div>
+                            <div class="text-2xl font-bold text-white mt-1">1,840 <span class="text-xs text-emerald-400 font-normal">+85</span></div>
                         </div>
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
                             <span class="text-xs text-slate-400">Leads Captados</span>
-                            <div class="text-2xl font-bold text-white mt-1">320 <span class="text-xs text-amber-400 font-normal">Tasa 2.8%</span></div>
+                            <div class="text-2xl font-bold text-white mt-1">320 <span class="text-xs text-amber-400 font-normal">2.8%</span></div>
                         </div>
                     </div>
                 </div>
@@ -191,57 +201,51 @@
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-8 items-stretch">
-                    <!-- Plan Starter -->
+                    <!-- Starter -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
                         <div>
                             <h3 class="text-xl font-bold text-white mb-2">Starter</h3>
                             <p class="text-slate-400 text-sm mb-6">Ideal para emprendedores y proyectos personales.</p>
                             <div class="text-4xl font-extrabold text-white mb-6">$29 <span class="text-sm font-normal text-slate-400">/mes</span></div>
-                            
                             <ul class="space-y-3 text-sm text-slate-300 mb-8">
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Rastreo de 500 palabras clave</li>
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Auditoría básica de 1 sitio web</li>
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> CRM de hasta 1,000 contactos</li>
-                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Envíos de email marketing básico</li>
                             </ul>
                         </div>
-                        <button class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition">Elegir Starter</button>
+                        <button onclick="selectPlan('Starter', '$29')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition">Elegir Starter</button>
                     </div>
 
-                    <!-- Plan Growth / Pro (Destacado) -->
+                    <!-- Growth Pro -->
                     <div class="bg-slate-900 border-2 border-orange-500 p-8 rounded-2xl flex flex-col justify-between relative shadow-2xl shadow-orange-500/10">
-                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">Más Popular</span>
+                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-bold uppercase">Más Popular</span>
                         <div>
                             <h3 class="text-xl font-bold text-white mb-2">Growth Pro</h3>
                             <p class="text-slate-400 text-sm mb-6">Perfecto para pequeñas agencias y empresas en crecimiento.</p>
                             <div class="text-4xl font-extrabold text-white mb-6">$79 <span class="text-sm font-normal text-slate-400">/mes</span></div>
-                            
                             <ul class="space-y-3 text-sm text-slate-300 mb-8">
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Rastreo de 2,500 palabras clave</li>
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Auditoría técnica de hasta 5 sitios</li>
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> CRM con 10,000 contactos</li>
-                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Automatización de emails y secuencias</li>
-                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Análisis de competidores ilimitado</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Automatización de emails</li>
                             </ul>
                         </div>
-                        <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded-lg transition shadow-lg shadow-orange-500/20">Probar 14 Días Gratis</button>
+                        <button onclick="selectPlan('Growth Pro', '$79')" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded-lg transition shadow-lg shadow-orange-500/20">Contratar Growth Pro</button>
                     </div>
 
-                    <!-- Plan Enterprise -->
+                    <!-- Enterprise -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
                         <div>
                             <h3 class="text-xl font-bold text-white mb-2">Enterprise</h3>
                             <p class="text-slate-400 text-sm mb-6">Para agencias grandes y empresas con alto volumen.</p>
                             <div class="text-4xl font-extrabold text-white mb-6">$199 <span class="text-sm font-normal text-slate-400">/mes</span></div>
-                            
                             <ul class="space-y-3 text-sm text-slate-300 mb-8">
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Palabras clave y proyectos ilimitados</li>
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> CRM con contactos ilimitados</li>
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Acceso a API de datos SEO y CRM</li>
-                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Soporte prioritario 24/7 y gestor de cuenta</li>
                             </ul>
                         </div>
-                        <button class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition">Contactar Ventas</button>
+                        <button onclick="selectPlan('Enterprise', '$199')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition">Elegir Enterprise</button>
                     </div>
                 </div>
             </div>
@@ -249,10 +253,97 @@
 
     </main>
 
+    <!-- MODAL: INICIAR SESIÓN -->
+    <div id="modal-login" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative shadow-2xl">
+            <button onclick="closeModal('modal-login')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-2xl font-bold text-white mb-2">Iniciar Sesión</h3>
+            <p class="text-slate-400 text-sm mb-6">Ingresa tus datos para acceder a tu panel.</p>
+            <form onsubmit="handleFormSubmit(event, '¡Sesión iniciada con éxito!')" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Correo Electrónico</label>
+                    <input type="email" required placeholder="tu@email.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Contraseña</label>
+                    <input type="password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition">Acceder</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: REGISTRO / PRUEBA GRATIS -->
+    <div id="modal-register" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative shadow-2xl">
+            <button onclick="closeModal('modal-register')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-2xl font-bold text-white mb-2">Comenzar Prueba Gratis</h3>
+            <p class="text-slate-400 text-sm mb-6">Disfruta de 14 días sin compromiso.</p>
+            <form onsubmit="handleFormSubmit(event, '¡Cuenta creada con éxito! Revisa tu correo.')" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Nombre Completo</label>
+                    <input type="text" required placeholder="Tu Nombre" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Correo Electrónico</label>
+                    <input type="email" required placeholder="tu@email.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Contraseña</label>
+                    <input type="password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition">Crear Cuenta Gratis</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: PASARELA DE PAGO -->
+    <div id="modal-checkout" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative shadow-2xl">
+            <button onclick="closeModal('modal-checkout')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-2xl font-bold text-white mb-1">Pasarela de Pago</h3>
+            <p class="text-slate-400 text-xs mb-4">Plan seleccionado: <span id="checkout-plan-name" class="text-orange-400 font-bold"></span> (<span id="checkout-plan-price" class="text-white font-bold"></span>)</p>
+            
+            <form onsubmit="handleFormSubmit(event, '¡Pago procesado con éxito!')" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Método de Pago</label>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <label class="bg-slate-950 border border-slate-800 p-2 rounded-lg flex items-center justify-center gap-2 text-xs cursor-pointer hover:border-orange-500">
+                            <input type="radio" name="payment-method" checked class="accent-orange-500">
+                            <i class="fa-solid fa-credit-card text-orange-400"></i> Tarjeta
+                        </label>
+                        <label class="bg-slate-950 border border-slate-800 p-2 rounded-lg flex items-center justify-center gap-2 text-xs cursor-pointer hover:border-orange-500">
+                            <input type="radio" name="payment-method" class="accent-orange-500">
+                            <i class="fa-brands fa-paypal text-blue-400"></i> PayPal
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Número de Tarjeta</label>
+                    <input type="text" required placeholder="4532 •••• •••• 8890" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Expiración</label>
+                        <input type="text" required placeholder="MM/AA" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">CVC / CVV</label>
+                        <input type="text" required placeholder="123" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 rounded-lg transition mt-2">
+                    Completar Suscripción
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Pie de Página -->
     <footer class="border-t border-slate-800 bg-slate-950 py-8 text-center text-xs text-slate-500">
-        <p>&copy; 2026 GrowthPulse. Alojadod en GitHub Pages.</p>
+        <p>&copy; 2026 GrowthPulse. Alojado en GitHub Pages.</p>
     </footer>
 
 </body>
+</html>
 </html>
