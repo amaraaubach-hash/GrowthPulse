@@ -1,321 +1,258 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GrowthPulse - SEO Data & Inbound Marketing Platform</title>
-    <!-- Tailwind CSS CDN -->
+    <title>GrowthPulse - Plataforma Integral de Marketing Digital</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            orange: '#FF5C35', // HubSpot Warm Accent
-                            deep: '#0B132B',   // SEMrush Dark Console
-                            navy: '#1C2541',   // Data Card Navy
-                            coral: '#FF7A59',  // Inbound Coral
-                            accent: '#3A86FF'  // Data Blue
-                        }
-                    }
-                }
+        function navigateTo(pageId) {
+            const pages = document.querySelectorAll('.page-view');
+            pages.forEach(page => page.classList.add('hidden'));
+            
+            const selectedPage = document.getElementById(pageId);
+            if (selectedPage) {
+                selectedPage.classList.remove('hidden');
             }
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('text-orange-500', 'font-bold'));
+            
+            const activeLink = document.getElementById('nav-' + pageId);
+            if (activeLink) {
+                activeLink.classList.add('text-orange-500', 'font-bold');
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
-    <style>
-        .gradient-text {
-            background: linear-gradient(135deg, #FF7A59 0%, #FF5C35 50%, #3A86FF 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .hero-bg {
-            background: radial-gradient(circle at 50% 20%, rgba(255, 92, 53, 0.08) 0%, rgba(11, 19, 43, 1) 70%);
-        }
-    </style>
 </head>
-<body class="bg-brand-deep text-slate-100 font-sans antialiased selection:bg-brand-orange selection:text-white">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
 
-    <!-- NAVIGATION BAR -->
-    <nav class="sticky top-0 z-50 backdrop-blur-md bg-brand-deep/80 border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <!-- Logo -->
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-orange to-brand-coral flex items-center justify-center shadow-lg shadow-brand-orange/20">
-                        <i class="fa-solid fa-chart-line text-white text-lg"></i>
-                    </div>
-                    <span class="text-xl font-bold tracking-tight text-white">Growth<span class="text-brand-coral">Pulse</span></span>
+    <!-- Navegación Principal -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
+                <div class="bg-orange-500 p-2 rounded-lg text-white font-bold text-xl flex items-center justify-center w-9 h-9">
+                    <i class="fa-solid me-0.5 fa-chart-line"></i>
                 </div>
+                <span class="text-xl font-bold tracking-tight text-white">GrowthPulse</span>
+            </div>
 
-                <!-- Navigation Links -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#features" class="text-slate-300 hover:text-white transition-colors text-sm font-medium">Herramientas SEO</a>
-                    <a href="#inbound" class="text-slate-300 hover:text-white transition-colors text-sm font-medium">Inbound CRM</a>
-                    <a href="#stats" class="text-slate-300 hover:text-white transition-colors text-sm font-medium">Métricas</a>
-                    <a href="#pricing" class="text-slate-300 hover:text-white transition-colors text-sm font-medium">Planes</a>
-                </div>
+            <nav class="hidden md:flex items-center gap-8 text-sm text-slate-300">
+                <button id="nav-home" onclick="navigateTo('home')" class="nav-link text-orange-500 font-bold hover:text-white transition">Inicio</button>
+                <button id="nav-tools" onclick="navigateTo('tools')" class="nav-link hover:text-white transition">Herramientas</button>
+                <button id="nav-metrics" onclick="navigateTo('metrics')" class="nav-link hover:text-white transition">Métricas</button>
+                <button id="nav-pricing" onclick="navigateTo('pricing')" class="nav-link hover:text-white transition">Planes y Precios</button>
+            </nav>
 
-                <!-- Action Buttons -->
-                <div class="flex items-center gap-4">
-                    <button class="hidden sm:block text-slate-300 hover:text-white text-sm font-medium px-4 py-2">Iniciar Sesión</button>
-                    <a href="#audit" class="bg-gradient-to-r from-brand-orange to-brand-coral hover:opacity-90 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-brand-orange/25 transition-all">Prueba Gratis</a>
-                </div>
+            <div class="flex items-center gap-4">
+                <button onclick="navigateTo('pricing')" class="text-sm hover:text-white text-slate-300 hidden sm:block">Iniciar Sesión</button>
+                <button onclick="navigateTo('pricing')" class="bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm px-4 py-2 rounded-lg transition shadow-lg shadow-orange-500/20">
+                    Prueba Gratis
+                </button>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- HERO SECTION (SEMrush Search + HubSpot Messaging) -->
-    <section class="hero-bg pt-16 pb-24 border-b border-slate-800 relative overflow-hidden" id="audit">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <!-- Badge -->
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/80 border border-slate-700 mb-8 text-xs font-semibold text-brand-coral uppercase tracking-wider">
-                <span class="w-2 h-2 rounded-full bg-brand-orange animate-pulse"></span>
-                Auditoría SEO + Inbound Marketing en una sola Suite
-            </div>
+    <!-- Contenedor de Páginas Dinámicas -->
+    <main class="flex-grow pt-16">
 
-            <!-- Title -->
-            <h1 class="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-tight mb-6">
-                Atrae tráfico con datos SEO. <br>
-                <span class="gradient-text">Convierte visitantes en clientes.</span>
-            </h1>
+        <!-- PÁGINA 1: INICIO -->
+        <section id="home" class="page-view">
+            <!-- Hero -->
+            <div class="max-w-5xl mx-auto text-center px-6 pt-20 pb-12">
+                <span class="bg-orange-500/10 text-orange-400 border border-orange-500/20 text-xs px-3 py-1.5 rounded-full font-medium inline-block mb-6">
+                    Solución de Marketing Todo en Uno
+                </span>
+                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+                    El poder de los <span class="text-orange-500">Datos SEO</span> con la calidez del <span class="text-amber-400">Inbound CRM</span>
+                </h1>
+                <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-8">
+                    Atrae tráfico cualificado analizando a tu competencia y convierte cada visita en clientes satisfechos desde un solo panel.
+                </p>
 
-            <!-- Subtitle -->
-            <p class="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-                Descubre qué palabras clave utiliza tu competencia y activa automatizaciones de correo personalizadas para nutrir cada lead al instante.
-            </p>
-
-            <!-- Search Bar Component (SEMrush Interactive Style) -->
-            <div class="max-w-3xl mx-auto bg-brand-navy p-3 sm:p-4 rounded-2xl border border-slate-700 shadow-2xl">
-                <form id="searchForm" onsubmit="event.preventDefault(); runAudit();" class="flex flex-col sm:flex-row gap-3">
-                    <div class="relative flex-grow">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-globe text-slate-400"></i>
-                        </div>
-                        <input type="text" id="domainInput" placeholder="Ingresa tu dominio o palabra clave (ej. miempresa.com)" 
-                            class="w-full pl-11 pr-4 py-3.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange transition-all text-sm" required>
-                    </div>
-                    <button type="submit" class="bg-gradient-to-r from-brand-orange to-brand-coral hover:from-brand-coral hover:to-brand-orange text-white font-semibold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-brand-orange/30 flex items-center justify-center gap-2 text-sm whitespace-nowrap">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <span>Analizar Gratis</span>
+                <!-- Buscador Interactivo -->
+                <div class="max-w-2xl mx-auto bg-slate-900 p-2 rounded-xl border border-slate-800 flex flex-col sm:flex-row gap-2 shadow-2xl">
+                    <input type="text" placeholder="Ingresa tu sitio web o palabra clave..." class="bg-transparent px-4 py-3 text-sm text-white focus:outline-none flex-grow">
+                    <button onclick="navigateTo('tools')" class="bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm px-6 py-3 rounded-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i> Analizar Gratis
                     </button>
-                </form>
-
-                <!-- Search Examples -->
-                <div class="flex items-center justify-center gap-4 mt-3 text-xs text-slate-400">
-                    <span>Probar ejemplo:</span>
-                    <button onclick="setDomain('hubspot.com')" class="hover:text-brand-coral transition-colors underline decoration-slate-700">hubspot.com</button>
-                    <button onclick="setDomain('semrush.com')" class="hover:text-brand-coral transition-colors underline decoration-slate-700">semrush.com</button>
                 </div>
             </div>
 
-            <!-- Interactive Audit Simulation Result (Hidden by default) -->
-            <div id="auditResult" class="hidden max-w-3xl mx-auto mt-6 p-6 bg-slate-900 rounded-2xl border border-brand-orange/40 text-left transition-all animate-fade-in">
-                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+            <!-- Métricas Realistas Resumidas -->
+            <div class="border-y border-slate-800 bg-slate-900/50 py-12">
+                <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                     <div>
-                        <span class="text-xs text-slate-400">Resultados para:</span>
-                        <h4 id="targetDomain" class="text-lg font-bold text-white">domain.com</h4>
+                        <div class="text-3xl md:text-4xl font-extrabold text-white">50M+</div>
+                        <div class="text-slate-400 text-sm mt-1">Palabras clave analizadas</div>
                     </div>
-                    <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold rounded-full">
-                        <i class="fa-solid fa-circle-check mr-1"></i> Análisis Completado
-                    </span>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 my-4">
-                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700">
-                        <span class="text-xs text-slate-400">Autoridad SEO</span>
-                        <p class="text-xl font-bold text-brand-orange mt-1">78 / 100</p>
-                    </div>
-                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700">
-                        <span class="text-xs text-slate-400">Tráfico Orgánico</span>
-                        <p class="text-xl font-bold text-white mt-1">124.5K/mes</p>
-                    </div>
-                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700">
-                        <span class="text-xs text-slate-400">Backlinks</span>
-                        <p class="text-xl font-bold text-white mt-1">45.2K</p>
-                    </div>
-                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700">
-                        <span class="text-xs text-slate-400">Oportunidades</span>
-                        <p class="text-xl font-bold text-emerald-400 mt-1">18 Sugerencias</p>
-                    </div>
-                </div>
-                <div class="flex justify-between items-center pt-2 text-xs">
-                    <span class="text-slate-400">¿Quieres descargar el reporte Inbound completo?</span>
-                    <button class="text-brand-coral font-semibold hover:underline">Registrarse gratis &rarr;</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- STATS BAR -->
-    <section class="bg-slate-950 py-12 border-b border-slate-800" id="stats">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                <div>
-                    <p class="text-3xl sm:text-4xl font-extrabold text-white">25B+</p>
-                    <p class="text-slate-400 text-sm mt-1">Palabras clave analizadas</p>
-                </div>
-                <div>
-                    <p class="text-3xl sm:text-4xl font-extrabold text-brand-orange">800M+</p>
-                    <p class="text-slate-400 text-sm mt-1">Dominios rastreados</p>
-                </div>
-                <div>
-                    <p class="text-3xl sm:text-4xl font-extrabold text-white">+45%</p>
-                    <p class="text-slate-400 text-sm mt-1">Tasa media de conversión</p>
-                </div>
-                <div>
-                    <p class="text-3xl sm:text-4xl font-extrabold text-brand-coral">150K+</p>
-                    <p class="text-slate-400 text-sm mt-1">Especialistas activos</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FEATURES GRID (SEMrush Data Analytics + HubSpot Inbound Hubs) -->
-    <section class="py-24 bg-brand-deep" id="features">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <h2 class="text-xs font-semibold text-brand-orange uppercase tracking-widest mb-3">Solución Integral</h2>
-                <p class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Todo lo que necesitas para tu estrategia digital</p>
-                <p class="text-slate-400 mt-4 text-base">Unimos la investigación técnica de palabras clave con herramientas amigables de gestión de clientes.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Card 1: Data Analytics (SEMrush Style) -->
-                <div class="bg-brand-navy p-8 rounded-2xl border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between group">
                     <div>
-                        <div class="w-12 h-12 bg-blue-500/10 text-brand-accent rounded-xl flex items-center justify-center text-xl mb-6 border border-blue-500/20 group-hover:scale-110 transition-transform">
+                        <div class="text-3xl md:text-4xl font-extrabold text-white">500K+</div>
+                        <div class="text-slate-400 text-sm mt-1">Dominios rastreados</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl md:text-4xl font-extrabold text-white">+38%</div>
+                        <div class="text-slate-400 text-sm mt-1">Tasa media de conversión</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl md:text-4xl font-extrabold text-white">12K+</div>
+                        <div class="text-slate-400 text-sm mt-1">Proyectos activos</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PÁGINA 2: HERRAMIENTAS -->
+        <section id="tools" class="page-view hidden py-16">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-3xl font-bold text-white mb-4">Herramientas Diseñadas para Crecer</h2>
+                    <p class="text-slate-400">Combina análisis técnico profundo con herramientas amigables de relación con clientes.</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-orange-500/50 transition">
+                        <div class="w-12 h-12 bg-orange-500/10 text-orange-400 rounded-xl flex items-center justify-center mb-6 text-xl">
                             <i class="fa-solid fa-magnifying-glass-chart"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-3">SEO Hub & Palabras Clave</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                            Analiza el volumen de búsquedas, la dificultad de posicionamiento y espía las estrategias de tráfico pagado de tus competidores.
+                        <h3 class="text-xl font-bold text-white mb-3">SEO & Keyword Research</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                            Descubre qué busca tu audiencia y analiza la estrategia de tu competencia paso a paso.
                         </p>
                     </div>
-                    <ul class="space-y-2 text-xs text-slate-300">
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-orange"></i> Auditoría técnica de sitio web</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-orange"></i> Rastreo diario de posiciones</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-orange"></i> Análisis masivo de backlinks</li>
-                    </ul>
-                </div>
 
-                <!-- Card 2: Inbound CRM (HubSpot Style) -->
-                <div class="bg-brand-navy p-8 rounded-2xl border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between group">
-                    <div>
-                        <div class="w-12 h-12 bg-orange-500/10 text-brand-orange rounded-xl flex items-center justify-center text-xl mb-6 border border-orange-500/20 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-users-gear"></i>
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-amber-500/50 transition">
+                        <div class="w-12 h-12 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center mb-6 text-xl">
+                            <i class="fa-solid fa-users"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-3">Inbound CRM & Leads</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                            Capta visitantes con formularios inteligentes y segmenta automáticamente tus contactos para un seguimiento de ventas efectivo.
+                        <h3 class="text-xl font-bold text-white mb-3">Inbound CRM</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                            Organiza tus contactos, realiza seguimiento de oportunidades de venta y automatiza tus respuestas.
                         </p>
                     </div>
-                    <ul class="space-y-2 text-xs text-slate-300">
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-orange"></i> Formularios y Pop-ups interactivos</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-orange"></i> Pipeline de ventas visual</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-orange"></i> Segmentación automática de contactos</li>
-                    </ul>
-                </div>
 
-                <!-- Card 3: Content Automation -->
-                <div class="bg-brand-navy p-8 rounded-2xl border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between group">
-                    <div>
-                        <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center text-xl mb-6 border border-emerald-500/20 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-paper-plane"></i>
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-emerald-500/50 transition">
+                        <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center mb-6 text-xl">
+                            <i class="fa-solid fa-envelope-open-text"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-3">Email Marketing Automation</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                            Diseña secuencias de correo electrónico automatizadas activadas por las acciones concretas de los usuarios en tu web.
+                        <h3 class="text-xl font-bold text-white mb-3">Email Marketing & Nurturing</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                            Diseña secuencias de correo automatizadas para acompañar a tus prospectos hasta la compra.
                         </p>
                     </div>
-                    <ul class="space-y-2 text-xs text-slate-300">
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-orange"></i> Editor visual Drag & Drop</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-orange"></i> Pruebas A/B en tiempo real</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-orange"></i> Métricas de apertura y clics</li>
-                    </ul>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- CALL TO ACTION (Warm Inbound CTA) -->
-    <section class="py-20 bg-gradient-to-r from-brand-orange to-brand-coral relative overflow-hidden" id="inbound">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-6">Empieza a hacer crecer tu negocio hoy mismo</h2>
-            <p class="text-white/90 text-lg max-w-2xl mx-auto mb-8">Únete a más de 100,000 profesionales de marketing que ya optimizan sus sitios web y convierten tráfico en ventas.</p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="#audit" class="w-full sm:w-auto bg-brand-deep hover:bg-slate-900 text-white font-bold px-8 py-4 rounded-xl shadow-2xl transition-all text-center text-sm">
-                    Crear cuenta gratuita
-                </a>
-                <a href="#" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold px-8 py-4 rounded-xl backdrop-blur-sm transition-all text-center text-sm border border-white/20">
-                    Agendar una demostración
-                </a>
-            </div>
-            <p class="text-white/70 text-xs mt-6">Sin tarjeta de crédito requerida • Configuración en 2 minutos</p>
-        </div>
-    </section>
+        <!-- PÁGINA 3: MÉTRICAS -->
+        <section id="metrics" class="page-view hidden py-16">
+            <div class="max-w-5xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-white mb-4">Panel de Métricas en Tiempo Real</h2>
+                    <p class="text-slate-400">Una vista previa de los informes que obtendrás con GrowthPulse.</p>
+                </div>
 
-    <!-- FOOTER -->
-    <footer class="bg-slate-950 border-t border-slate-800 text-slate-400 text-sm py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
-                <div class="col-span-2">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-orange to-brand-coral flex items-center justify-center">
-                            <i class="fa-solid fa-chart-line text-white text-sm"></i>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+                    <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+                        <div>
+                            <span class="text-xs text-slate-400">Sitio analizado</span>
+                            <h4 class="text-lg font-bold text-white">midominio.com</h4>
                         </div>
-                        <span class="text-lg font-bold text-white">GrowthPulse</span>
+                        <span class="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full font-medium">Salud Web: 92/100</span>
                     </div>
-                    <p class="text-xs text-slate-500 max-w-sm mb-4">
-                        Combinando analítica avanzada de SEO con automatización de Inbound Marketing para acelerar tu crecimiento digital.
-                    </p>
-                </div>
-                <div>
-                    <p class="text-white font-semibold mb-3 text-xs uppercase tracking-wider">Herramientas</p>
-                    <ul class="space-y-2 text-xs">
-                        <li><a href="#" class="hover:text-white transition-colors">Auditoría SEO</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Investigación Keyword</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Analizador Backlinks</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="text-white font-semibold mb-3 text-xs uppercase tracking-wider">CRM Inbound</p>
-                    <ul class="space-y-2 text-xs">
-                        <li><a href="#" class="hover:text-white transition-colors">Captación Leads</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Email Automation</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Pipeline de Ventas</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <p class="text-white font-semibold mb-3 text-xs uppercase tracking-wider">Recursos</p>
-                    <ul class="space-y-2 text-xs">
-                        <li><a href="#" class="hover:text-white transition-colors">Blog Inbound</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Guías SEO</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Soporte</a></li>
-                    </ul>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+                            <span class="text-xs text-slate-400">Tráfico Orgánico Est.</span>
+                            <div class="text-2xl font-bold text-white mt-1">14,250 <span class="text-xs text-emerald-400 font-normal">+12%</span></div>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+                            <span class="text-xs text-slate-400">Keywords Posicionadas</span>
+                            <div class="text-2xl font-bold text-white mt-1">1,840 <span class="text-xs text-emerald-400 font-normal">+85 este mes</span></div>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+                            <span class="text-xs text-slate-400">Leads Captados</span>
+                            <div class="text-2xl font-bold text-white mt-1">320 <span class="text-xs text-amber-400 font-normal">Tasa 2.8%</span></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-600 gap-4">
-                <p>&copy; 2026 GrowthPulse Inc. Todos los derechos reservados.</p>
-                <div class="flex gap-6">
-                    <a href="#" class="hover:text-slate-400">Privacidad</a>
-                    <a href="#" class="hover:text-slate-400">Términos de servicio</a>
-                    <a href="#" class="hover:text-slate-400">Cookies</a>
+        </section>
+
+        <!-- PÁGINA 4: PLANES Y PRECIOS -->
+        <section id="pricing" class="page-view hidden py-16">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-3xl font-bold text-white mb-4">Planes Transparentes para Cada Etapa</h2>
+                    <p class="text-slate-400">Elige el plan ideal para impulsar la visibilidad y ventas de tu negocio.</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 items-stretch">
+                    <!-- Plan Starter -->
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">Starter</h3>
+                            <p class="text-slate-400 text-sm mb-6">Ideal para emprendedores y proyectos personales.</p>
+                            <div class="text-4xl font-extrabold text-white mb-6">$29 <span class="text-sm font-normal text-slate-400">/mes</span></div>
+                            
+                            <ul class="space-y-3 text-sm text-slate-300 mb-8">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Rastreo de 500 palabras clave</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Auditoría básica de 1 sitio web</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> CRM de hasta 1,000 contactos</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Envíos de email marketing básico</li>
+                            </ul>
+                        </div>
+                        <button class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition">Elegir Starter</button>
+                    </div>
+
+                    <!-- Plan Growth / Pro (Destacado) -->
+                    <div class="bg-slate-900 border-2 border-orange-500 p-8 rounded-2xl flex flex-col justify-between relative shadow-2xl shadow-orange-500/10">
+                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">Más Popular</span>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">Growth Pro</h3>
+                            <p class="text-slate-400 text-sm mb-6">Perfecto para pequeñas agencias y empresas en crecimiento.</p>
+                            <div class="text-4xl font-extrabold text-white mb-6">$79 <span class="text-sm font-normal text-slate-400">/mes</span></div>
+                            
+                            <ul class="space-y-3 text-sm text-slate-300 mb-8">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Rastreo de 2,500 palabras clave</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Auditoría técnica de hasta 5 sitios</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> CRM con 10,000 contactos</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Automatización de emails y secuencias</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Análisis de competidores ilimitado</li>
+                            </ul>
+                        </div>
+                        <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded-lg transition shadow-lg shadow-orange-500/20">Probar 14 Días Gratis</button>
+                    </div>
+
+                    <!-- Plan Enterprise -->
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">Enterprise</h3>
+                            <p class="text-slate-400 text-sm mb-6">Para agencias grandes y empresas con alto volumen.</p>
+                            <div class="text-4xl font-extrabold text-white mb-6">$199 <span class="text-sm font-normal text-slate-400">/mes</span></div>
+                            
+                            <ul class="space-y-3 text-sm text-slate-300 mb-8">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Palabras clave y proyectos ilimitados</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> CRM con contactos ilimitados</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Acceso a API de datos SEO y CRM</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Soporte prioritario 24/7 y gestor de cuenta</li>
+                            </ul>
+                        </div>
+                        <button class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition">Contactar Ventas</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+    </main>
+
+    <!-- Pie de Página -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-8 text-center text-xs text-slate-500">
+        <p>&copy; 2026 GrowthPulse. Alojadod en GitHub Pages.</p>
     </footer>
 
-    <!-- INTERACTIVE SCRIPT -->
-    <script>
-        function setDomain(domain) {
+</body>
 </html>
