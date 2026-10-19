@@ -37,18 +37,11 @@
             document.getElementById(modalId).classList.remove('flex');
         }
 
-        function selectPlan(planName, price) {
-            document.getElementById('checkout-plan-name').innerText = planName;
-            document.getElementById('checkout-plan-price').innerText = price;
-            openModal('modal-checkout');
-        }
-
         function handleFormSubmit(event, message) {
             event.preventDefault();
             alert(message);
             closeModal('modal-login');
             closeModal('modal-register');
-            closeModal('modal-checkout');
         }
     </script>
 </head>
@@ -201,7 +194,7 @@
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-8 items-stretch">
-                    <!-- Starter -->
+                    <!-- Starter ($29) -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
                         <div>
                             <h3 class="text-xl font-bold text-white mb-2">Starter</h3>
@@ -213,10 +206,10 @@
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> CRM de hasta 1,000 contactos</li>
                             </ul>
                         </div>
-                        <button onclick="selectPlan('Starter', '$29')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition">Elegir Starter</button>
+                        <a href="https://buy.stripe.com/00w3cx2TedbB9jJetZ2Ji01" target="_blank" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition text-center block">Elegir Starter</a>
                     </div>
 
-                    <!-- Growth Pro -->
+                    <!-- Growth Pro ($79) -->
                     <div class="bg-slate-900 border-2 border-orange-500 p-8 rounded-2xl flex flex-col justify-between relative shadow-2xl shadow-orange-500/10">
                         <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-bold uppercase">Más Popular</span>
                         <div>
@@ -230,10 +223,10 @@
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Automatización de emails</li>
                             </ul>
                         </div>
-                        <button onclick="selectPlan('Growth Pro', '$79')" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded-lg transition shadow-lg shadow-orange-500/20">Contratar Growth Pro</button>
+                        <a href="https://buy.stripe.com/dRm7sN0L6efF0NddpV2Ji02" target="_blank" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded-lg transition text-center block shadow-lg shadow-orange-500/20">Contratar Growth Pro</a>
                     </div>
 
-                    <!-- Enterprise -->
+                    <!-- Enterprise ($199) -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
                         <div>
                             <h3 class="text-xl font-bold text-white mb-2">Enterprise</h3>
@@ -245,7 +238,7 @@
                                 <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Acceso a API de datos SEO y CRM</li>
                             </ul>
                         </div>
-                        <button onclick="selectPlan('Enterprise', '$199')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition">Elegir Enterprise</button>
+                        <a href="https://buy.stripe.com/bJe28t2TefjJbrR0D92Ji00" target="_blank" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition text-center block">Elegir Enterprise</a>
                     </div>
                 </div>
             </div>
@@ -293,48 +286,6 @@
                     <input type="password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
                 </div>
                 <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition">Crear Cuenta Gratis</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: PASARELA DE PAGO -->
-    <div id="modal-checkout" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative shadow-2xl">
-            <button onclick="closeModal('modal-checkout')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h3 class="text-2xl font-bold text-white mb-1">Pasarela de Pago</h3>
-            <p class="text-slate-400 text-xs mb-4">Plan seleccionado: <span id="checkout-plan-name" class="text-orange-400 font-bold"></span> (<span id="checkout-plan-price" class="text-white font-bold"></span>)</p>
-            
-            <form onsubmit="handleFormSubmit(event, '¡Pago procesado con éxito!')" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Método de Pago</label>
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <label class="bg-slate-950 border border-slate-800 p-2 rounded-lg flex items-center justify-center gap-2 text-xs cursor-pointer hover:border-orange-500">
-                            <input type="radio" name="payment-method" checked class="accent-orange-500">
-                            <i class="fa-solid fa-credit-card text-orange-400"></i> Tarjeta
-                        </label>
-                        <label class="bg-slate-950 border border-slate-800 p-2 rounded-lg flex items-center justify-center gap-2 text-xs cursor-pointer hover:border-orange-500">
-                            <input type="radio" name="payment-method" class="accent-orange-500">
-                            <i class="fa-brands fa-paypal text-blue-400"></i> PayPal
-                        </label>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Número de Tarjeta</label>
-                    <input type="text" required placeholder="4532 •••• •••• 8890" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-orange-500">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Expiración</label>
-                        <input type="text" required placeholder="MM/AA" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-orange-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">CVC / CVV</label>
-                        <input type="text" required placeholder="123" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-orange-500">
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2.5 rounded-lg transition mt-2">
-                    Completar Suscripción
-                </button>
             </form>
         </div>
     </div>
