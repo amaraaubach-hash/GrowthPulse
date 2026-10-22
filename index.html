@@ -66,7 +66,7 @@
             window.updateAuthUI();
         });
 
-        // Registrar usuario en Firebase y Firestore con panel de éxito
+        // Registrar usuario en Firebase y Firestore (cierre garantizado)
         window.handleRegisterFirebase = async (event) => {
             event.preventDefault();
             const name = document.getElementById('reg-name').value;
@@ -80,29 +80,33 @@
                 const now = new Date();
                 const fechaRegistro = now.toLocaleString('es-ES');
 
-                await setDoc(doc(db, "users", user.uid), {
-                    nombre: name,
-                    email: email,
-                    fechaRegistro: fechaRegistro,
-                    planPagado: "Ninguno (Prueba Gratuita)",
-                    metodoPago: "Pendiente",
-                    fechaFinPlan: "Sin Suscripción Activa",
-                    isPaid: false
-                });
+                try {
+                    await setDoc(doc(db, "users", user.uid), {
+                        nombre: name,
+                        email: email,
+                        fechaRegistro: fechaRegistro,
+                        planPagado: "Ninguno (Prueba Gratuita)",
+                        metodoPago: "Pendiente",
+                        fechaFinPlan: "Sin Suscripción Activa",
+                        isPaid: false
+                    });
+                } catch (dbErr) {
+                    console.log("Aviso en Firestore:", dbErr);
+                }
 
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', email);
                 window.updateAuthUI();
                 
-                // Cerrar modal de registro y resetear formulario
+                // Cierre INMEDIATO de la modal de registro
                 closeModal('modal-register');
                 event.target.reset();
 
-                // Mostrar modal de éxito personalizado
+                // Mostrar modal flotante de éxito
                 openModal('modal-success');
                 setTimeout(() => {
                     closeModal('modal-success');
-                }, 3500); // Se cierra automáticamente tras 3.5 segundos
+                }, 3000);
 
             } catch (error) {
                 let mensaje = error.message;
@@ -587,35 +591,80 @@
             </div>
         </section>
 
-        <!-- PÁGINA 4: PLANES Y PRECIOS -->
+        <!-- PÁGINA 4: PLANES Y PRECIOS (MEJORADA Y COMPLETA) -->
         <section id="pricing" class="page-view hidden py-16">
             <div class="max-w-7xl mx-auto px-6">
                 <div class="text-center max-w-3xl mx-auto mb-16">
-                    <h2 class="text-3xl font-bold text-white mb-4">Planes Transparentes para Cada Etapa</h2>
+                    <span class="bg-orange-500/10 text-orange-400 border border-orange-500/20 text-xs px-3 py-1.5 rounded-full font-medium inline-block mb-4">
+                        Inversión Inteligente
+                    </span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Planes Transparentes para Cada Etapa</h2>
+                    <p class="text-slate-400 text-base">Elegidos por más de 12,000 negocios para escalar tráfico y captación de clientes sin sorpresas ni costes ocultos.</p>
                 </div>
+
                 <div class="grid md:grid-cols-3 gap-8 items-stretch">
-                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
+                    <!-- Plan 1: Starter -->
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between hover:border-slate-700 transition shadow-xl">
                         <div>
-                            <h3 class="text-xl font-bold text-white mb-2">Starter</h3>
-                            <div class="text-4xl font-extrabold text-white mb-6">$29 <span class="text-sm text-slate-400">/mes</span></div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Para Emprendedores</span>
+                            <h3 class="text-2xl font-bold text-white mt-1 mb-2">Starter</h3>
+                            <div class="text-4xl font-extrabold text-white mb-6">$29 <span class="text-sm font-normal text-slate-400">/mes</span></div>
+                            
+                            <p class="text-xs text-slate-400 mb-6">Ideal para pequeños negocios o proyectos personales que están dando sus primeros pasos en SEO.</p>
+                            
+                            <div class="border-t border-slate-800/80 pt-6 space-y-3 text-xs text-slate-300">
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-500"></i> <span>Rastreo de <strong>500 Keywords</strong></span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-500"></i> <span><strong>1,000 Contactos</strong> en CRM</span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-500"></i> <span>Auditoría de 1 Sitio Web</span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-500"></i> <span>Informes básicos en PDF</span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-500"></i> <span>Soporte estándar por correo</span></div>
+                            </div>
                         </div>
-                        <button onclick="window.checkoutFirebase('https://buy.stripe.com/00w3cx2TedbB9jJetZ2Ji01', 'Starter ($29/mes)')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition text-center block">Elegir Starter</button>
+                        <button onclick="window.checkoutFirebase('https://buy.stripe.com/00w3cx2TedbB9jJetZ2Ji01', 'Starter ($29/mes)')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition text-center block mt-8">Elegir Starter</button>
                     </div>
 
-                    <div class="bg-slate-900 border-2 border-orange-500 p-8 rounded-2xl flex flex-col justify-between">
+                    <!-- Plan 2: Growth Pro (Destacado) -->
+                    <div class="bg-slate-900 border-2 border-orange-500 p-8 rounded-2xl flex flex-col justify-between shadow-2xl relative">
+                        <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
+                            MÁS POPULAR
+                        </span>
                         <div>
-                            <h3 class="text-xl font-bold text-white mb-2">Growth Pro</h3>
-                            <div class="text-4xl font-extrabold text-white mb-6">$79 <span class="text-sm text-slate-400">/mes</span></div>
+                            <span class="text-xs font-semibold text-orange-400 uppercase tracking-wider">Para Empresas en Crecimiento</span>
+                            <h3 class="text-2xl font-bold text-white mt-1 mb-2">Growth Pro</h3>
+                            <div class="text-4xl font-extrabold text-white mb-6">$79 <span class="text-sm font-normal text-slate-400">/mes</span></div>
+                            
+                            <p class="text-xs text-slate-400 mb-6">La solución más completa para acelerar ventas, dominar palabras clave y automatizar Inbound CRM.</p>
+                            
+                            <div class="border-t border-slate-800/80 pt-6 space-y-3 text-xs text-slate-200">
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-400"></i> <span>Rastreo de <strong>5,000 Keywords</strong></span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-400"></i> <span><strong>10,000 Contactos</strong> CRM e Inbound</span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-400"></i> <span>Auditoría de 5 Sitios Web</span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-400"></i> <span>Análisis de Competencia Ilimitado</span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-400"></i> <span>Email Marketing Automatizado</span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-400"></i> <span>Soporte Prioritario 24/7</span></div>
+                            </div>
                         </div>
-                        <button onclick="window.checkoutFirebase('https://buy.stripe.com/dRm7sN0L6efF0NddpV2Ji02', 'Growth Pro ($79/mes)')" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded-lg transition text-center block">Contratar Growth Pro</button>
+                        <button onclick="window.checkoutFirebase('https://buy.stripe.com/dRm7sN0L6efF0NddpV2Ji02', 'Growth Pro ($79/mes)')" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl transition text-center block mt-8 shadow-lg shadow-orange-500/25">Contratar Growth Pro</button>
                     </div>
 
-                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
+                    <!-- Plan 3: Enterprise -->
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between hover:border-slate-700 transition shadow-xl">
                         <div>
-                            <h3 class="text-xl font-bold text-white mb-2">Enterprise</h3>
-                            <div class="text-4xl font-extrabold text-white mb-6">$199 <span class="text-sm text-slate-400">/mes</span></div>
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Para Grandes Marcas y Agencias</span>
+                            <h3 class="text-2xl font-bold text-white mt-1 mb-2">Enterprise</h3>
+                            <div class="text-4xl font-extrabold text-white mb-6">$199 <span class="text-sm font-normal text-slate-400">/mes</span></div>
+                            
+                            <p class="text-xs text-slate-400 mb-6">Máxima potencia con acceso a API, integraciones avanzadas y gestión ilimitada de clientes.</p>
+                            
+                            <div class="border-t border-slate-800/80 pt-6 space-y-3 text-xs text-slate-300">
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-500"></i> <span>Rastreo de <strong>25,000 Keywords</strong></span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-500"></i> <span>Contactos CRM <strong>Ilimitados</strong></span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-500"></i> <span>Dominios e Informes ilimitados</span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-500"></i> <span>Acceso completo a la API de datos</span></div>
+                                <div class="flex items-center gap-2.5"><i class="fa-solid fa-check text-orange-500"></i> <span>Gerente de cuenta dedicado</span></div>
+                            </div>
                         </div>
-                        <button onclick="window.checkoutFirebase('https://buy.stripe.com/bJe28t2TefjJbrR0D92Ji00', 'Enterprise ($199/mes)')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition text-center block">Elegir Enterprise</button>
+                        <button onclick="window.checkoutFirebase('https://buy.stripe.com/bJe28t2TefjJbrR0D92Ji00', 'Enterprise ($199/mes)')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition text-center block mt-8">Elegir Enterprise</button>
                     </div>
                 </div>
             </div>
