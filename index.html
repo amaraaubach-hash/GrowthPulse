@@ -7,21 +7,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Módulo SDK de Firebase -->
+    <!-- Integración Firebase (Authentication & Firestore) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // PEGA AQUÍ TUS CLAVES OBTENIDAS DE FIREBASE
+        // SUSTITUYE ESTO CON TUS CLAVES REALES DE FIREBASE
         const firebaseConfig = {
-            apiKey: "AIzaSyDZi3aI25TsZbjb9c1KzPMGEQLjIScii6g",
-            authDomain: "growthpulse-66a07.firebaseapp.com",
-            projectId: "growthpulse-66a07",
-            storageBucket: "growthpulse-66a07.firebasestorage.app",
-            messagingSenderId: "543270489864",
-            appId: "1:543270489864:web:f7baef1ac41194649266bd",
-            measurementId: "G-QMK6RS22VE"
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROYECTO.firebaseapp.com",
+            projectId: "TU_PROYECTO_ID",
+            storageBucket: "TU_PROYECTO.appspot.com",
+            messagingSenderId: "TU_SENDER_ID",
+            appId: "TU_APP_ID"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -30,56 +29,58 @@
 
         window.currentUser = null;
 
-        // Escuchar el estado de la sesión
+        // Escuchar el estado de autenticación en tiempo real
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 window.currentUser = user;
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', user.email);
+                
+                // Consultar en Firestore el plan contratado
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    window.currentUserData = userDoc.data();
+                }
             } else {
                 window.currentUser = null;
+                window.currentUserData = null;
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('userEmail');
             }
             updateAuthUI();
         });
 
-        // Registro de Usuario guardando Nombre, Email y Fecha de Registro
+        // Función global de registro en Firebase
         window.handleRegisterFirebase = async (event) => {
             event.preventDefault();
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-password').value;
+            const name = event.target.querySelector('input[type="text"]').value;
+            const email = event.target.querySelectorAll('input[type="email"]')[0].value;
+            const password = event.target.querySelector('input[type="password"]').value;
 
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                const now = new Date();
-                const fechaRegistro = now.toLocaleString('es-ES');
-
-                // Guardar perfil inicial en Firestore
+                // Guardar usuario en la base de datos Firestore
                 await setDoc(doc(db, "users", user.uid), {
-                    nombre: name,
+                    name: name,
                     email: email,
-                    fechaRegistro: fechaRegistro,
-                    planPagado: "Ninguno (Prueba Gratuita)",
-                    metodoPago: "Pendiente",
-                    fechaFinPlan: "Sin Suscripción Activa",
-                    isPaid: false
+                    plan: "Gratuito / Sin Plan",
+                    isPaid: false,
+                    createdAt: new Date().toISOString()
                 });
 
                 closeModal('modal-register');
             } catch (error) {
-                alert("Error en el registro: " + error.message);
+                alert("Error al registrar: " + error.message);
             }
         };
 
-        // Inicio de sesión
+        // Función global de inicio de sesión
         window.handleLoginFirebase = async (event) => {
             event.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+            const email = event.target.querySelector('input[type="email"]').value;
+            const password = event.target.querySelector('input[type="password"]').value;
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
@@ -89,28 +90,22 @@
             }
         };
 
-        // Cierre de sesión
+        // Cierre de sesión en Firebase
         window.confirmLogoutFirebase = async () => {
             await signOut(auth);
             closeModal('modal-logout');
         };
 
-        // Al pulsar en Pagar: guarda el Plan, Método de Pago y la Fecha de Fin (+30 días)
+        // Registrar selección de plan en la BD previo a Stripe
         window.checkoutFirebase = async (stripeUrl, planName) => {
             if (!window.currentUser) {
                 openModal('modal-register');
             } else {
-                const now = new Date();
-                const finPlan = new Date();
-                finPlan.setDate(now.getDate() + 30); // Añade 30 días de vigencia
-
-                // Actualizar documento en la base de datos Firestore
-                await updateDoc(doc(db, "users", window.currentUser.uid), {
-                    planPagado: planName,
-                    metodoPago: "Stripe Checkout (Tarjeta/GPay/ApplePay)",
-                    fechaFinPlan: finPlan.toLocaleString('es-ES'),
-                    isPaid: true
-                });
+                // Actualizar en Firestore el intento de contratación
+                await setDoc(doc(db, "users", window.currentUser.uid), {
+                    planIntent: planName,
+                    lastCheckoutAttempt: new Date().toISOString()
+                }, { merge: true });
 
                 window.open(stripeUrl, '_blank');
             }
@@ -179,7 +174,6 @@
     </script>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col">
-
     <!-- Navegación Principal -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur fixed w-full top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -203,8 +197,10 @@
         </div>
     </header>
 
+    <!-- Contenedor de Páginas Dinámicas -->
     <main class="flex-grow pt-16">
-        <!-- INICIO -->
+
+        <!-- PÁGINA 1: INICIO -->
         <section id="home" class="page-view">
             <div class="max-w-5xl mx-auto text-center px-6 pt-20 pb-12">
                 <span class="bg-orange-500/10 text-orange-400 border border-orange-500/20 text-xs px-3 py-1.5 rounded-full font-medium inline-block mb-6">
@@ -216,59 +212,335 @@
                 <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-8">
                     Atrae tráfico cualificado analizando a tu competencia y convierte cada visita en clientes satisfechos.
                 </p>
+
+                <div class="max-w-2xl mx-auto bg-slate-900 p-2 rounded-xl border border-slate-800 flex flex-col sm:flex-row gap-2 shadow-2xl">
+                    <input type="text" placeholder="Ingresa tu sitio web o palabra clave..." class="bg-transparent px-4 py-3 text-sm text-white focus:outline-none flex-grow">
+                    <button onclick="navigateTo('tools')" class="bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm px-6 py-3 rounded-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i> Analizar Gratis
+                    </button>
+                </div>
+            </div>
+
+            <div class="border-y border-slate-800 bg-slate-900/50 py-12">
+                <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                    <div>
+                        <div class="text-3xl md:text-4xl font-extrabold text-white">50M+</div>
+                        <div class="text-slate-400 text-sm mt-1">Palabras clave analizadas</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl md:text-4xl font-extrabold text-white">500K+</div>
+                        <div class="text-slate-400 text-sm mt-1">Dominios rastreados</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl md:text-4xl font-extrabold text-white">+38%</div>
+                        <div class="text-slate-400 text-sm mt-1">Tasa media de conversión</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl md:text-4xl font-extrabold text-white">12K+</div>
+                        <div class="text-slate-400 text-sm mt-1">Proyectos activos</div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- HERRAMIENTAS -->
+        <!-- PÁGINA 2: HERRAMIENTAS -->
         <section id="tools" class="page-view hidden py-16">
-            <div class="max-w-7xl mx-auto px-6 text-center">
-                <h2 class="text-3xl font-bold text-white mb-4">Herramientas Diseñadas para Crecer</h2>
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="bg-orange-500/10 text-orange-400 border border-orange-500/20 text-xs px-3 py-1.5 rounded-full font-medium inline-block mb-4">
+                        Suite Completa
+                    </span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Herramientas Diseñadas para Crecer</h2>
+                    <p class="text-slate-400 text-base">Combina análisis técnico profundo de SEO con herramientas amigables de relación con clientes para impulsar tu negocio.</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-orange-500/50 transition duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-orange-500/10 text-orange-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
+                                <i class="fa-solid fa-magnifying-glass-chart"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">SEO & Keyword Research</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-6">Descubre qué busca tu audiencia objetivo y analiza la estrategia exacta de tu competencia posición a posición.</p>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-300 border-t border-slate-800/80 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Dificultad de Keyword</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Intención de búsqueda</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Volumen mensual estimado</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-amber-500/50 transition duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Inbound CRM</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-6">Organiza tus contactos en embudos visuales, realiza seguimiento detallado de ventas y centraliza la comunicación.</p>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-300 border-t border-slate-800/80 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-amber-400"></i> Pipeline de ventas Kanban</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-amber-400"></i> Historial unificado de contactos</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-amber-400"></i> Lead Scoring automático</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-emerald-500/50 transition duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
+                                <i class="fa-solid fa-envelope-open-text"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Email Marketing</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-6">Diseña secuencias de correo automatizadas para nutrir prospectos y convertirlos en clientes recurrentes.</p>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-300 border-t border-slate-800/80 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Editor de correo intuitivo</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Automatización por comportamiento</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Métricas de apertura y clics</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-sky-500/50 transition duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-sky-500/10 text-sky-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
+                                <i class="fa-solid fa-code-compare"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Auditoría Técnica Web</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-6">Detecta errores de velocidad, enlaces rotos y problemas de indexación que frenan el posicionamiento de tu sitio.</p>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-300 border-t border-slate-800/80 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-sky-400"></i> Análisis Core Web Vitals</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-sky-400"></i> Detección de duplicados</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-sky-400"></i> Informes exportables en PDF</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-purple-500/50 transition duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-purple-500/10 text-purple-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
+                                <i class="fa-solid fa-chess-knight"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Análisis de Competencia</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-6">Supervisa los movimientos de tus competidores directos, sus palabras clave principales y sus mejores backlinks.</p>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-300 border-t border-slate-800/80 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-purple-400"></i> Comparativa frente a frente</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-purple-400"></i> Rastreador de brechas de contenido</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-purple-400"></i> Monitoreo de autoridad</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-rose-500/50 transition duration-300 flex flex-col justify-between group">
+                        <div>
+                            <div class="w-14 h-14 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Automatizaciones Inbound</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-6">Crea flujos de trabajo inteligentes para asignar tareas a tu equipo y cualificar prospectos 24/7.</p>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-300 border-t border-slate-800/80 pt-4">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-rose-400"></i> Disparadores personalizados</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-rose-400"></i> Asignación automática de notas</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-rose-400"></i> Notificaciones instantáneas</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- MÉTRICAS -->
+        <!-- PÁGINA 3: MÉTRICAS (ACTUALIZACIÓN DINÁMICA DE DATOS) -->
         <section id="metrics" class="page-view hidden py-16">
-            <div class="max-w-5xl mx-auto px-6 text-center">
-                <h2 class="text-3xl font-bold text-white mb-4">Panel de Métricas en Tiempo Real</h2>
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs px-3 py-1.5 rounded-full font-medium inline-block mb-4">
+                        Analítica Avanzada
+                    </span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Panel de Métricas en Tiempo Real</h2>
+                    <p class="text-slate-400">Examina el rendimiento orgánico y de captación de cualquier dominio con informes en tiempo real.</p>
+                </div>
+
+                <!-- Buscador de Dominio Interactivo -->
+                <div class="max-w-xl mx-auto bg-slate-900 p-2 rounded-xl border border-slate-800 flex gap-2 mb-10 shadow-xl">
+                    <input id="domain-input" type="text" placeholder="Ingresa un dominio (ej: google.com)" class="bg-transparent px-4 py-2.5 text-sm text-white focus:outline-none flex-grow">
+                    <button id="update-btn" onclick="updateDomain()" class="bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm px-5 py-2.5 rounded-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate"></i> Actualizar
+                    </button>
+                </div>
+
+                <!-- Dashboard de Métricas -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl">
+                    <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8 border-b border-slate-800 pb-6">
+                        <div>
+                            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Sitio web en análisis</span>
+                            <h4 id="display-domain" class="text-2xl font-bold text-white mt-1">midominio.com</h4>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span id="metric-health" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5">
+                                Salud Web: 92/100
+                            </span>
+                            <span id="metric-dr" class="bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-full">
+                                Autoridad: DR 68
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Fila de Tarjetas Principales -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                            <div class="text-xs text-slate-400 mb-1">Tráfico Orgánico Est.</div>
+                            <div id="metric-traffic" class="text-3xl font-extrabold text-white">14,250</div>
+                            <div class="text-xs text-emerald-400 mt-2 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-trend-up"></i> +12% este mes
+                            </div>
+                        </div>
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                            <div class="text-xs text-slate-400 mb-1">Keywords Posicionadas</div>
+                            <div id="metric-keywords" class="text-3xl font-extrabold text-white">1,840</div>
+                            <div class="text-xs text-emerald-400 mt-2 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-circle-plus"></i> +85 nuevas
+                            </div>
+                        </div>
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                            <div class="text-xs text-slate-400 mb-1">Leads Captados CRM</div>
+                            <div id="metric-leads" class="text-3xl font-extrabold text-white">320</div>
+                            <div class="text-xs text-amber-400 mt-2 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-bullseye"></i> 2.8% conversión
+                            </div>
+                        </div>
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                            <div class="text-xs text-slate-400 mb-1">Tasa de Rebote</div>
+                            <div class="text-3xl font-extrabold text-white">41.2%</div>
+                            <div class="text-xs text-emerald-400 mt-2 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-trend-down"></i> -3.5% vs previo
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico Visual y Tabla -->
+                    <div class="grid md:grid-cols-2 gap-8 pt-4">
+                        <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
+                            <h5 class="text-sm font-bold text-white mb-6 flex items-center gap-2">
+                                <i class="fa-solid fa-chart-simple text-orange-500"></i> Evolución de Tráfico (Últimos 6 Meses)
+                            </h5>
+                            <div class="flex items-end justify-between h-40 gap-3 pt-6 border-b border-slate-800 pb-2">
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="chart-bar w-full bg-orange-500/40 rounded-t group-hover:bg-orange-500 transition duration-500" style="height: 45%;"></div>
+                                    <span class="text-[10px] text-slate-500 mt-2">Mayo</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="chart-bar w-full bg-orange-500/50 rounded-t group-hover:bg-orange-500 transition duration-500" style="height: 58%;"></div>
+                                    <span class="text-[10px] text-slate-500 mt-2">Junio</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="chart-bar w-full bg-orange-500/60 rounded-t group-hover:bg-orange-500 transition duration-500" style="height: 65%;"></div>
+                                    <span class="text-[10px] text-slate-500 mt-2">Julio</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="chart-bar w-full bg-orange-500/75 rounded-t group-hover:bg-orange-500 transition duration-500" style="height: 78%;"></div>
+                                    <span class="text-[10px] text-slate-500 mt-2">Ago</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="chart-bar w-full bg-orange-500/90 rounded-t group-hover:bg-orange-500 transition duration-500" style="height: 88%;"></div>
+                                    <span class="text-[10px] text-slate-500 mt-2">Sept</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="chart-bar w-full bg-orange-500 rounded-t shadow-lg shadow-orange-500/20 transition duration-500" style="height: 100%;"></div>
+                                    <span class="text-[10px] text-orange-400 font-bold mt-2">Oct</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
+                            <h5 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-key text-amber-400"></i> Top Palabras Clave Posicionadas
+                            </h5>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between text-xs py-2 border-b border-slate-800">
+                                    <span class="text-slate-300 font-medium">software crm inbound</span>
+                                    <span class="text-emerald-400 font-bold">Pos. #1</span>
+                                    <span class="text-slate-400">5.4K vol.</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs py-2 border-b border-slate-800">
+                                    <span class="text-slate-300 font-medium">herramienta seo completa</span>
+                                    <span class="text-emerald-400 font-bold">Pos. #2</span>
+                                    <span class="text-slate-400">3.2K vol.</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs py-2 border-b border-slate-800">
+                                    <span class="text-slate-300 font-medium">automatizacion marketing</span>
+                                    <span class="text-emerald-400 font-bold">Pos. #4</span>
+                                    <span class="text-slate-400">8.1K vol.</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs py-2">
+                                    <span class="text-slate-300 font-medium">analizar competencia web</span>
+                                    <span class="text-emerald-400 font-bold">Pos. #5</span>
+                                    <span class="text-slate-400">2.9K vol.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- PLANES Y PRECIOS -->
+        <!-- PÁGINA 4: PLANES Y PRECIOS -->
         <section id="pricing" class="page-view hidden py-16">
             <div class="max-w-7xl mx-auto px-6">
                 <div class="text-center max-w-3xl mx-auto mb-16">
                     <h2 class="text-3xl font-bold text-white mb-4">Planes Transparentes para Cada Etapa</h2>
+                    <p class="text-slate-400">Elige el plan ideal para impulsar la visibilidad y ventas de tu negocio.</p>
                 </div>
+
                 <div class="grid md:grid-cols-3 gap-8 items-stretch">
                     <!-- Starter ($29) -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
                         <div>
                             <h3 class="text-xl font-bold text-white mb-2">Starter</h3>
-                            <div class="text-4xl font-extrabold text-white mb-6">$29 <span class="text-sm text-slate-400">/mes</span></div>
+                            <p class="text-slate-400 text-sm mb-6">Ideal para emprendedores y proyectos personales.</p>
+                            <div class="text-4xl font-extrabold text-white mb-6">$29 <span class="text-sm font-normal text-slate-400">/mes</span></div>
+                            <ul class="space-y-3 text-sm text-slate-300 mb-8">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Rastreo de 500 palabras clave</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Auditoría básica de 1 sitio web</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> CRM de hasta 1,000 contactos</li>
+                            </ul>
                         </div>
-                        <button onclick="window.checkoutFirebase('https://buy.stripe.com/00w3cx2TedbB9jJetZ2Ji01', 'Starter ($29/mes)')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition text-center block">Elegir Starter</button>
+                        <button onclick="checkout('https://buy.stripe.com/00w3cx2TedbB9jJetZ2Ji01')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition text-center block">Elegir Starter</button>
                     </div>
 
                     <!-- Growth Pro ($79) -->
-                    <div class="bg-slate-900 border-2 border-orange-500 p-8 rounded-2xl flex flex-col justify-between">
+                    <div class="bg-slate-900 border-2 border-orange-500 p-8 rounded-2xl flex flex-col justify-between relative shadow-2xl shadow-orange-500/10">
+                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-bold uppercase">Más Popular</span>
                         <div>
                             <h3 class="text-xl font-bold text-white mb-2">Growth Pro</h3>
-                            <div class="text-4xl font-extrabold text-white mb-6">$79 <span class="text-sm text-slate-400">/mes</span></div>
+                            <p class="text-slate-400 text-sm mb-6">Perfecto para pequeñas agencias y empresas en crecimiento.</p>
+                            <div class="text-4xl font-extrabold text-white mb-6">$79 <span class="text-sm font-normal text-slate-400">/mes</span></div>
+                            <ul class="space-y-3 text-sm text-slate-300 mb-8">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Rastreo de 2,500 palabras clave</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Auditoría técnica de hasta 5 sitios</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> CRM con 10,000 contactos</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-orange-400"></i> Automatización de emails</li>
+                            </ul>
                         </div>
-                        <button onclick="window.checkoutFirebase('https://buy.stripe.com/dRm7sN0L6efF0NddpV2Ji02', 'Growth Pro ($79/mes)')" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded-lg transition text-center block">Contratar Growth Pro</button>
+                        <button onclick="checkout('https://buy.stripe.com/dRm7sN0L6efF0NddpV2Ji02')" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded-lg transition text-center block shadow-lg shadow-orange-500/20">Contratar Growth Pro</button>
                     </div>
 
                     <!-- Enterprise ($199) -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl flex flex-col justify-between">
                         <div>
                             <h3 class="text-xl font-bold text-white mb-2">Enterprise</h3>
-                            <div class="text-4xl font-extrabold text-white mb-6">$199 <span class="text-sm text-slate-400">/mes</span></div>
+                            <p class="text-slate-400 text-sm mb-6">Para agencias grandes y empresas con alto volumen.</p>
+                            <div class="text-4xl font-extrabold text-white mb-6">$199 <span class="text-sm font-normal text-slate-400">/mes</span></div>
+                            <ul class="space-y-3 text-sm text-slate-300 mb-8">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Palabras clave y proyectos ilimitados</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> CRM con contactos ilimitados</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Acceso a API de datos SEO y CRM</li>
+                            </ul>
                         </div>
-                        <button onclick="window.checkoutFirebase('https://buy.stripe.com/bJe28t2TefjJbrR0D92Ji00', 'Enterprise ($199/mes)')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition text-center block">Elegir Enterprise</button>
+                        <button onclick="checkout('https://buy.stripe.com/bJe28t2TefjJbrR0D92Ji00')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-lg transition text-center block">Elegir Enterprise</button>
                     </div>
                 </div>
             </div>
         </section>
+
     </main>
 
     <!-- MODAL: INICIAR SESIÓN -->
@@ -276,56 +548,127 @@
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative shadow-2xl">
             <button onclick="closeModal('modal-login')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             <h3 class="text-2xl font-bold text-white mb-2">Iniciar Sesión</h3>
-            <form onsubmit="window.handleLoginFirebase(event)" class="space-y-4">
+            <p class="text-slate-400 text-sm mb-6">Ingresa tus datos para acceder a tu panel.</p>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">Correo Electrónico</label>
-                    <input id="login-email" type="email" required placeholder="tu@email.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
+                    <input type="email" required placeholder="tu@email.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">Contraseña</label>
-                    <input id="login-password" type="password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
+                    <input type="password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
                 </div>
                 <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition">Acceder</button>
             </form>
-        </div>
-    </div>
-
-    <!-- MODAL: REGISTRO -->
-    <div id="modal-register" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative shadow-2xl">
-            <button onclick="closeModal('modal-register')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h3 class="text-2xl font-bold text-white mb-2">Comenzar Prueba Gratis</h3>
-            <form onsubmit="window.handleRegisterFirebase(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Nombre Completo</label>
-                    <input id="reg-name" type="text" required placeholder="Tu Nombre" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Correo Electrónico</label>
-                    <input id="reg-email" type="email" required placeholder="tu@email.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Contraseña</label>
-                    <input id="reg-password" type="password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
-                </div>
-                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition">Crear Cuenta Gratis</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: CERRAR SESIÓN -->
-    <div id="modal-logout" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl p-6 relative shadow-2xl text-center">
-            <h3 class="text-xl font-bold text-white mb-2">¿Quieres cerrar sesión?</h3>
-            <div class="flex gap-3 mt-6">
-                <button onclick="closeModal('modal-logout')" class="w-1/2 bg-slate-800 text-white py-2.5 rounded-lg text-sm">Cancelar</button>
-                <button onclick="window.confirmLogoutFirebase()" class="w-1/2 bg-orange-500 text-white py-2.5 rounded-lg text-sm">Cerrar Sesión</button>
+            <div class="mt-4 pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
+                ¿Aún no tienes cuenta? 
+                <button onclick="openModal('modal-register')" class="text-orange-400 hover:text-orange-300 font-semibold ml-1">Regístrate gratis</button>
             </div>
         </div>
     </div>
 
-    <footer class="border-t border-slate-800 bg-slate-950 py-8 text-center text-xs text-slate-500 mt-auto">
-        <p>&copy; 2026 GrowthPulse. Conectado con Firebase & GitHub Pages.</p>
+    <!-- MODAL: REGISTRO / PRUEBA GRATIS -->
+    <div id="modal-register" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative shadow-2xl">
+            <button onclick="closeModal('modal-register')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-2xl font-bold text-white mb-2">Comenzar Prueba Gratis</h3>
+            <p class="text-slate-400 text-sm mb-6">Crea tu cuenta para continuar con la contratación.</p>
+            <form onsubmit="handleRegister(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Nombre Completo</label>
+                    <input type="text" required placeholder="Tu Nombre" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Correo Electrónico</label>
+                    <input type="email" required placeholder="tu@email.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Contraseña</label>
+                    <input type="password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500">
+                </div>
+                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition">Crear Cuenta Gratis</button>
+            </form>
+            <div class="mt-4 pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
+                ¿Ya tienes una cuenta? 
+                <button onclick="openModal('modal-login')" class="text-orange-400 hover:text-orange-300 font-semibold ml-1">Inicia sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIRMAR CERRAR SESIÓN -->
+    <div id="modal-logout" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl p-6 relative shadow-2xl text-center">
+            <button onclick="closeModal('modal-logout')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="w-12 h-12 bg-orange-500/10 text-orange-400 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">¿Quieres cerrar sesión?</h3>
+            <p class="text-slate-400 text-sm mb-6">Tendrás que volver a iniciar sesión para acceder a las opciones de pago.</p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('modal-logout')" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 rounded-lg transition text-sm">Cancelar</button>
+                <button onclick="confirmLogout()" class="w-1/2 bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition text-sm">Cerrar Sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIE DE PÁGINA (4 COLUMNAS) -->
+    <footer class="border-t border-slate-800 bg-slate-950 text-slate-400 pt-16 pb-12 text-sm mt-auto">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10">
+            <div class="space-y-4">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
+                    <div class="bg-orange-500 p-2 rounded-lg text-white font-bold text-xl flex items-center justify-center w-8 h-8">
+                        <i class="fa-solid fa-chart-line text-sm"></i>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight text-white">GrowthPulse</span>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Plataforma híbrida que combina datos de analítica SEO y gestión de relaciones Inbound CRM para potenciar el crecimiento digital de tu negocio.
+                </p>
+                <div class="flex gap-4 text-slate-400 pt-2">
+                    <a href="#" class="hover:text-orange-500 transition"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" class="hover:text-orange-500 transition"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="#" class="hover:text-orange-500 transition"><i class="fa-brands fa-github"></i></a>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-4">Plataforma</h4>
+                <ul class="space-y-2.5 text-xs">
+                    <li><button onclick="navigateTo('home')" class="hover:text-white transition">Inicio</button></li>
+                    <li><button onclick="navigateTo('tools')" class="hover:text-white transition">Herramientas SEO & CRM</button></li>
+                    <li><button onclick="navigateTo('metrics')" class="hover:text-white transition">Métricas en Tiempo Real</button></li>
+                    <li><button onclick="navigateTo('pricing')" class="hover:text-white transition">Planes y Precios</button></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-4">Soluciones</h4>
+                <ul class="space-y-2.5 text-xs text-slate-400">
+                    <li><span class="hover:text-white cursor-pointer transition">Investigación de Keywords</span></li>
+                    <li><span class="hover:text-white cursor-pointer transition">Gestión de Embudos CRM</span></li>
+                    <li><span class="hover:text-white cursor-pointer transition">Email Marketing Automatizado</span></li>
+                    <li><span class="hover:text-white cursor-pointer transition">Auditorías Técnicas Web</span></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-4">Infraestructura</h4>
+                <div class="space-y-3 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-slate-300">Alojado en GitHub Pages</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-slate-400">
+                        <i class="fa-solid fa-lock text-slate-500"></i>
+                        <span>Pagos seguros con Stripe</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 pt-2 border-t border-slate-900">
+                        &copy; 2026 GrowthPulse. Todos los derechos reservados.
+                    </p>
+                </div>
+            </div>
+        </div>
     </footer>
+
 </body>
 </html>
