@@ -28,13 +28,21 @@
         }
 
         function openModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
-            document.getElementById(modalId).classList.add('flex');
+            closeModal('modal-login');
+            closeModal('modal-register');
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-            document.getElementById(modalId).classList.remove('flex');
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
         }
 
         function handleFormSubmit(event, message) {
@@ -263,6 +271,10 @@
                 </div>
                 <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition">Acceder</button>
             </form>
+            <div class="mt-4 pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
+                ¿Aún no tienes cuenta? 
+                <button onclick="openModal('modal-register')" class="text-orange-400 hover:text-orange-300 font-semibold ml-1">Regístrate gratis</button>
+            </div>
         </div>
     </div>
 
@@ -287,6 +299,10 @@
                 </div>
                 <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition">Crear Cuenta Gratis</button>
             </form>
+            <div class="mt-4 pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
+                ¿Ya tienes una cuenta? 
+                <button onclick="openModal('modal-login')" class="text-orange-400 hover:text-orange-300 font-semibold ml-1">Inicia sesión</button>
+            </div>
         </div>
     </div>
 
@@ -296,5 +312,4 @@
     </footer>
 
 </body>
-</html>
 </html>
