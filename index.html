@@ -66,7 +66,7 @@
             window.updateAuthUI();
         });
 
-        // Registrar usuario en Firebase y Firestore (cierre garantizado)
+        // Registrar usuario en Firebase (Cierre Inmediato Garantizado)
         window.handleRegisterFirebase = async (event) => {
             event.preventDefault();
             const name = document.getElementById('reg-name').value;
@@ -74,39 +74,36 @@
             const password = document.getElementById('reg-password').value;
 
             try {
+                // 1. Crear el usuario en Auth
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                const now = new Date();
-                const fechaRegistro = now.toLocaleString('es-ES');
-
-                try {
-                    await setDoc(doc(db, "users", user.uid), {
-                        nombre: name,
-                        email: email,
-                        fechaRegistro: fechaRegistro,
-                        planPagado: "Ninguno (Prueba Gratuita)",
-                        metodoPago: "Pendiente",
-                        fechaFinPlan: "Sin Suscripción Activa",
-                        isPaid: false
-                    });
-                } catch (dbErr) {
-                    console.log("Aviso en Firestore:", dbErr);
-                }
-
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('userEmail', email);
-                window.updateAuthUI();
-                
-                // Cierre INMEDIATO de la modal de registro
+                // 2. CIERRE INMEDIATO DE LA VENTANA DE REGISTRO
                 closeModal('modal-register');
                 event.target.reset();
 
-                // Mostrar modal flotante de éxito
+                // 3. Guardar estado local y actualizar UI de inmediato
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userEmail', email);
+                window.updateAuthUI();
+
+                // 4. Mostrar modal flotante de éxito
                 openModal('modal-success');
                 setTimeout(() => {
                     closeModal('modal-success');
                 }, 3000);
+
+                // 5. Intentar guardar en Firestore de fondo sin bloquear el flujo visual
+                const now = new Date();
+                setDoc(doc(db, "users", user.uid), {
+                    nombre: name,
+                    email: email,
+                    fechaRegistro: now.toLocaleString('es-ES'),
+                    planPagado: "Ninguno (Prueba Gratuita)",
+                    metodoPago: "Pendiente",
+                    fechaFinPlan: "Sin Suscripción Activa",
+                    isPaid: false
+                }).catch(e => console.log("Nota Firestore:", e.message));
 
             } catch (error) {
                 let mensaje = error.message;
@@ -591,7 +588,7 @@
             </div>
         </section>
 
-        <!-- PÁGINA 4: PLANES Y PRECIOS (MEJORADA Y COMPLETA) -->
+        <!-- PÁGINA 4: PLANES Y PRECIOS -->
         <section id="pricing" class="page-view hidden py-16">
             <div class="max-w-7xl mx-auto px-6">
                 <div class="text-center max-w-3xl mx-auto mb-16">
