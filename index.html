@@ -204,9 +204,26 @@
                 setTimeout(() => {
                     document.getElementById('display-domain').innerText = cleanDomain;
                     const seed = cleanDomain.length;
-                    document.getElementById('metric-traffic').innerText = (seed * 3420 + 8200).toLocaleString();
-                    document.getElementById('metric-keywords').innerText = (seed * 210 + 450).toLocaleString();
-                    document.getElementById('metric-leads').innerText = Math.floor(seed * 28 + 110);
+                    
+                    // Cálculo dinámico de métricas
+                    const traffic = Math.floor(seed * 3420 + 8200);
+                    const keywords = Math.floor(seed * 210 + 450);
+                    const leads = Math.floor(seed * 28 + 110);
+                    const health = Math.min(99, Math.floor(seed * 3 + 68));
+                    const dr = Math.min(95, Math.floor(seed * 4 + 35));
+
+                    document.getElementById('metric-traffic').innerText = traffic.toLocaleString();
+                    document.getElementById('metric-keywords').innerText = keywords.toLocaleString();
+                    document.getElementById('metric-leads').innerText = leads.toLocaleString();
+                    document.getElementById('metric-health').innerText = `Salud Web: ${health}/100`;
+                    document.getElementById('metric-dr').innerText = `Autoridad: DR ${dr}`;
+                    
+                    // Actualizar tabla de keywords dinámicamente
+                    document.getElementById('kw-1-name').innerText = `comprar en ${cleanDomain}`;
+                    document.getElementById('kw-2-name').innerText = `${cleanDomain} precios y servicios`;
+                    document.getElementById('kw-3-name').innerText = `alternativas a ${cleanDomain}`;
+                    document.getElementById('kw-4-name').innerText = `opiniones ${cleanDomain}`;
+
                     btn.innerHTML = `<i class="fa-solid fa-rotate"></i> Actualizar`;
                     btn.disabled = false;
                 }, 600);
@@ -393,17 +410,18 @@
             </div>
         </section>
 
-        <!-- PÁGINA 3: MÉTRICAS -->
+        <!-- PÁGINA 3: MÉTRICAS AVANZADAS (REDISAÑADA) -->
         <section id="metrics" class="page-view hidden py-16">
             <div class="max-w-6xl mx-auto px-6">
-                <div class="text-center max-w-3xl mx-auto mb-12">
+                <div class="text-center max-w-3xl mx-auto mb-10">
                     <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs px-3 py-1.5 rounded-full font-medium inline-block mb-4">
                         Analítica Avanzada
                     </span>
                     <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Panel de Métricas en Tiempo Real</h2>
-                    <p class="text-slate-400">Examina el rendimiento orgánico y de captación de cualquier dominio con informes en tiempo real.</p>
+                    <p class="text-slate-400">Examina el rendimiento orgánico y de captación de cualquier dominio con informes interactivos.</p>
                 </div>
 
+                <!-- Buscador de Dominio Interactivo -->
                 <div class="max-w-xl mx-auto bg-slate-900 p-2 rounded-xl border border-slate-800 flex gap-2 mb-10 shadow-xl">
                     <input id="domain-input" type="text" placeholder="Ingresa un dominio (ej: google.com)" class="bg-transparent px-4 py-2.5 text-sm text-white focus:outline-none flex-grow">
                     <button id="update-btn" onclick="updateDomain()" class="bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm px-5 py-2.5 rounded-lg transition flex items-center gap-2">
@@ -411,38 +429,129 @@
                     </button>
                 </div>
 
+                <!-- Dashboard Principal -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl">
+                    <!-- Cabecera del Dominio -->
                     <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8 border-b border-slate-800 pb-6">
                         <div>
                             <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Sitio web en análisis</span>
-                            <h4 id="display-domain" class="text-2xl font-bold text-white mt-1">midominio.com</h4>
+                            <h4 id="display-domain" class="text-2xl font-bold text-white mt-1">google.com</h4>
                         </div>
                         <div class="flex items-center gap-3">
                             <span id="metric-health" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5">
-                                Salud Web: 92/100
+                                <i class="fa-solid fa-heart-pulse"></i> Salud Web: 92/100
                             </span>
-                            <span id="metric-dr" class="bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-full">
-                                Autoridad: DR 68
+                            <span id="metric-dr" class="bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                                <i class="fa-solid fa-shield-halved text-orange-500"></i> Autoridad: DR 68
                             </span>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                    <!-- Fila de Tarjetas de KPI -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800/80 hover:border-orange-500/40 transition">
                             <div class="text-xs text-slate-400 mb-1">Tráfico Orgánico Est.</div>
-                            <div id="metric-traffic" class="text-3xl font-extrabold text-white">14,250</div>
+                            <div id="metric-traffic" class="text-3xl font-extrabold text-white">42,400</div>
+                            <div class="text-xs text-emerald-400 mt-2 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-trend-up"></i> +14.2% este mes
+                            </div>
                         </div>
-                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800/80 hover:border-amber-500/40 transition">
                             <div class="text-xs text-slate-400 mb-1">Keywords Posicionadas</div>
-                            <div id="metric-keywords" class="text-3xl font-extrabold text-white">1,840</div>
+                            <div id="metric-keywords" class="text-3xl font-extrabold text-white">2,550</div>
+                            <div class="text-xs text-emerald-400 mt-2 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-circle-plus"></i> +112 nuevas
+                            </div>
                         </div>
-                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800/80 hover:border-emerald-500/40 transition">
                             <div class="text-xs text-slate-400 mb-1">Leads Captados CRM</div>
-                            <div id="metric-leads" class="text-3xl font-extrabold text-white">320</div>
+                            <div id="metric-leads" class="text-3xl font-extrabold text-white">390</div>
+                            <div class="text-xs text-amber-400 mt-2 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-bullseye"></i> 3.1% tasa conv.
+                            </div>
                         </div>
-                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800/80 hover:border-sky-500/40 transition">
                             <div class="text-xs text-slate-400 mb-1">Tasa de Rebote</div>
                             <div class="text-3xl font-extrabold text-white">41.2%</div>
+                            <div class="text-xs text-emerald-400 mt-2 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-trend-down"></i> -2.4% optimizado
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fila 2: Gráfico de Evolución y Tabla de Keywords -->
+                    <div class="grid md:grid-cols-2 gap-8 pt-2">
+                        <!-- Gráfico de Tráfico -->
+                        <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
+                            <div class="flex items-center justify-between mb-6">
+                                <h5 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-chart-column text-orange-500"></i> Evolución de Tráfico (Últimos 6 Meses)
+                                </h5>
+                                <span class="text-[10px] bg-slate-900 border border-slate-800 text-slate-400 px-2 py-1 rounded">Visitas únicas</span>
+                            </div>
+
+                            <div class="flex items-end justify-between h-44 gap-3 pt-6 border-b border-slate-800 pb-2">
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="w-full bg-orange-500/40 rounded-t group-hover:bg-orange-500 transition duration-300" style="height: 45%;"></div>
+                                    <span class="text-[10px] text-slate-500 mt-2">Mayo</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="w-full bg-orange-500/55 rounded-t group-hover:bg-orange-500 transition duration-300" style="height: 58%;"></div>
+                                    <span class="text-[10px] text-slate-500 mt-2">Junio</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="w-full bg-orange-500/70 rounded-t group-hover:bg-orange-500 transition duration-300" style="height: 68%;"></div>
+                                    <span class="text-[10px] text-slate-500 mt-2">Julio</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="w-full bg-orange-500/80 rounded-t group-hover:bg-orange-500 transition duration-300" style="height: 80%;"></div>
+                                    <span class="text-[10px] text-slate-500 mt-2">Ago</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="w-full bg-orange-500/90 rounded-t group-hover:bg-orange-500 transition duration-300" style="height: 88%;"></div>
+                                    <span class="text-[10px] text-slate-500 mt-2">Sept</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
+                                    <div class="w-full bg-orange-500 rounded-t shadow-lg shadow-orange-500/30 transition duration-300" style="height: 100%;"></div>
+                                    <span class="text-[10px] text-orange-400 font-bold mt-2">Oct</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabla de Palabras Clave TOP -->
+                        <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
+                            <h5 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-key text-amber-400"></i> Top Palabras Clave Posicionadas
+                            </h5>
+
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between text-xs py-2.5 border-b border-slate-800">
+                                    <span id="kw-1-name" class="text-slate-200 font-medium truncate max-w-[180px]">comprar en google.com</span>
+                                    <span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Pos. #1</span>
+                                    <span class="text-slate-400 font-mono">12.4K vol.</span>
+                                </div>
+
+                                <div class="flex items-center justify-between text-xs py-2.5 border-b border-slate-800">
+                                    <span id="kw-2-name" class="text-slate-200 font-medium truncate max-w-[180px]">google.com precios y servicios</span>
+                                    <span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Pos. #2</span>
+                                    <span class="text-slate-400 font-mono">8.1K vol.</span>
+                                </div>
+
+                                <div class="flex items-center justify-between text-xs py-2.5 border-b border-slate-800">
+                                    <span id="kw-3-name" class="text-slate-200 font-medium truncate max-w-[180px]">alternativas a google.com</span>
+                                    <span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Pos. #4</span>
+                                    <span class="text-slate-400 font-mono">4.5K vol.</span>
+                                </div>
+
+                                <div class="flex items-center justify-between text-xs py-2.5">
+                                    <span id="kw-4-name" class="text-slate-200 font-medium truncate max-w-[180px]">opiniones google.com</span>
+                                    <span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Pos. #5</span>
+                                    <span class="text-slate-400 font-mono">2.9K vol.</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
