@@ -93,9 +93,18 @@
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', email);
                 window.updateAuthUI();
+                
+                // Cerrar modal y limpiar formulario
                 closeModal('modal-register');
+                event.target.reset();
             } catch (error) {
-                alert("Error al registrar: " + error.message);
+                let mensaje = error.message;
+                if (error.code === 'auth/email-already-in-use') {
+                    mensaje = "Este correo electrónico ya está registrado. Por favor, inicia sesión.";
+                } else if (error.code === 'auth/weak-password') {
+                    mensaje = "La contraseña es demasiado débil. Usa al menos 6 caracteres.";
+                }
+                alert(mensaje);
             }
         };
 
@@ -110,9 +119,18 @@
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', email);
                 window.updateAuthUI();
+                
+                // Cerrar modal y limpiar formulario
                 closeModal('modal-login');
+                event.target.reset();
             } catch (error) {
-                alert("Error de acceso: " + error.message);
+                let mensaje = "Error de acceso: Credenciales incorrectas.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                    mensaje = "Este correo no está registrado o la contraseña es incorrecta.";
+                } else if (error.code === 'auth/wrong-password') {
+                    mensaje = "Contraseña incorrecta.";
+                }
+                alert(mensaje);
             }
         };
 
@@ -205,7 +223,6 @@
                     document.getElementById('display-domain').innerText = cleanDomain;
                     const seed = cleanDomain.length;
                     
-                    // Cálculo dinámico de métricas principales
                     const traffic = Math.floor(seed * 3420 + 8200);
                     const keywords = Math.floor(seed * 210 + 450);
                     const leads = Math.floor(seed * 28 + 110);
@@ -218,7 +235,6 @@
                     document.getElementById('metric-health').innerText = `Salud Web: ${health}/100`;
                     document.getElementById('metric-dr').innerText = `Autoridad: DR ${dr}`;
                     
-                    // Actualizar altura de las barras del gráfico de forma dinámica según el dominio
                     document.getElementById('bar-1').style.height = Math.min(100, Math.max(30, (seed * 3) + 25)) + '%';
                     document.getElementById('bar-2').style.height = Math.min(100, Math.max(35, (seed * 4) + 35)) + '%';
                     document.getElementById('bar-3').style.height = Math.min(100, Math.max(40, (seed * 2) + 50)) + '%';
@@ -226,7 +242,6 @@
                     document.getElementById('bar-5').style.height = Math.min(100, Math.max(50, (seed * 3) + 60)) + '%';
                     document.getElementById('bar-6').style.height = Math.min(100, Math.max(60, (seed * 2) + 70)) + '%';
 
-                    // Actualizar tabla de keywords dinámicamente
                     document.getElementById('kw-1-name').innerText = `comprar en ${cleanDomain}`;
                     document.getElementById('kw-2-name').innerText = `${cleanDomain} precios y servicios`;
                     document.getElementById('kw-3-name').innerText = `alternativas a ${cleanDomain}`;
