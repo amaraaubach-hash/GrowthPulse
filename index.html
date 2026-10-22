@@ -66,7 +66,7 @@
             window.updateAuthUI();
         });
 
-        // Registrar usuario en Firebase y Firestore
+        // Registrar usuario en Firebase y Firestore con panel de éxito
         window.handleRegisterFirebase = async (event) => {
             event.preventDefault();
             const name = document.getElementById('reg-name').value;
@@ -94,9 +94,16 @@
                 localStorage.setItem('userEmail', email);
                 window.updateAuthUI();
                 
-                // Cerrar modal y limpiar formulario
+                // Cerrar modal de registro y resetear formulario
                 closeModal('modal-register');
                 event.target.reset();
+
+                // Mostrar modal de éxito personalizado
+                openModal('modal-success');
+                setTimeout(() => {
+                    closeModal('modal-success');
+                }, 3500); // Se cierra automáticamente tras 3.5 segundos
+
             } catch (error) {
                 let mensaje = error.message;
                 if (error.code === 'auth/email-already-in-use') {
@@ -119,8 +126,6 @@
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', email);
                 window.updateAuthUI();
-                
-                // Cerrar modal y limpiar formulario
                 closeModal('modal-login');
                 event.target.reset();
             } catch (error) {
@@ -195,6 +200,7 @@
             closeModal('modal-login');
             closeModal('modal-register');
             closeModal('modal-logout');
+            closeModal('modal-success');
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.remove('hidden');
@@ -655,6 +661,17 @@
                 </div>
                 <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition">Crear Cuenta Gratis</button>
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ÉXITO DE REGISTRO -->
+    <div id="modal-success" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-emerald-500/50 w-full max-w-sm rounded-2xl p-6 text-center shadow-2xl space-y-4">
+            <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-3xl">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">¡Cuenta creada con éxito!</h3>
+            <p class="text-xs text-slate-400">Te has registrado correctamente en GrowthPulse. Tu sesión se ha iniciado de forma automática.</p>
         </div>
     </div>
 
