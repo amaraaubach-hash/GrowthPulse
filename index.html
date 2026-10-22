@@ -108,8 +108,42 @@
 
         function updateDomain() {
             const inputVal = document.getElementById('domain-input').value;
+            const btn = document.getElementById('update-btn');
+            
             if (inputVal.trim() !== '') {
-                document.getElementById('display-domain').innerText = inputVal.toLowerCase().replace(/^(https?:\/\/)?(www\.)?/, '');
+                const cleanDomain = inputVal.toLowerCase().replace(/^(https?:\/\/)?(www\.)?/, '');
+                
+                // Efecto visual de carga
+                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Analizando...`;
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    document.getElementById('display-domain').innerText = cleanDomain;
+                    
+                    // Generación de métricas dinámicas según el texto escrito
+                    const seed = cleanDomain.length;
+                    const traffic = (seed * 3420 + 8200).toLocaleString();
+                    const keywords = (seed * 210 + 450).toLocaleString();
+                    const leads = Math.floor(seed * 28 + 110);
+                    const health = Math.min(99, Math.max(70, seed * 3 + 62));
+                    const dr = Math.min(95, Math.max(20, seed * 5 + 30));
+
+                    document.getElementById('metric-traffic').innerText = traffic;
+                    document.getElementById('metric-keywords').innerText = keywords;
+                    document.getElementById('metric-leads').innerText = leads;
+                    document.getElementById('metric-health').innerText = `Salud Web: ${health}/100`;
+                    document.getElementById('metric-dr').innerText = `Autoridad: DR ${dr}`;
+
+                    // Ajustar alturas dinámicas en las barras del gráfico
+                    const bars = document.querySelectorAll('.chart-bar');
+                    bars.forEach((bar, index) => {
+                        const newHeight = Math.min(100, Math.max(20, (seed * (index + 2) * 7) % 100));
+                        bar.style.height = `${newHeight}%`;
+                    });
+
+                    btn.innerHTML = `<i class="fa-solid fa-rotate"></i> Actualizar`;
+                    btn.disabled = false;
+                }, 600);
             }
         }
     </script>
@@ -185,7 +219,7 @@
             </div>
         </section>
 
-        <!-- PÁGINA 2: HERRAMIENTAS (MEJORADA) -->
+        <!-- PÁGINA 2: HERRAMIENTAS -->
         <section id="tools" class="page-view hidden py-16">
             <div class="max-w-7xl mx-auto px-6">
                 <div class="text-center max-w-3xl mx-auto mb-16">
@@ -197,7 +231,6 @@
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Card 1 -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-orange-500/50 transition duration-300 flex flex-col justify-between group">
                         <div>
                             <div class="w-14 h-14 bg-orange-500/10 text-orange-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
@@ -213,7 +246,6 @@
                         </ul>
                     </div>
 
-                    <!-- Card 2 -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-amber-500/50 transition duration-300 flex flex-col justify-between group">
                         <div>
                             <div class="w-14 h-14 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
@@ -229,7 +261,6 @@
                         </ul>
                     </div>
 
-                    <!-- Card 3 -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-emerald-500/50 transition duration-300 flex flex-col justify-between group">
                         <div>
                             <div class="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
@@ -245,7 +276,6 @@
                         </ul>
                     </div>
 
-                    <!-- Card 4 -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-sky-500/50 transition duration-300 flex flex-col justify-between group">
                         <div>
                             <div class="w-14 h-14 bg-sky-500/10 text-sky-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
@@ -261,7 +291,6 @@
                         </ul>
                     </div>
 
-                    <!-- Card 5 -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-purple-500/50 transition duration-300 flex flex-col justify-between group">
                         <div>
                             <div class="w-14 h-14 bg-purple-500/10 text-purple-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
@@ -277,7 +306,6 @@
                         </ul>
                     </div>
 
-                    <!-- Card 6 -->
                     <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl hover:border-rose-500/50 transition duration-300 flex flex-col justify-between group">
                         <div>
                             <div class="w-14 h-14 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition duration-300">
@@ -296,7 +324,7 @@
             </div>
         </section>
 
-        <!-- PÁGINA 3: MÉTRICAS (MEJORADA) -->
+        <!-- PÁGINA 3: MÉTRICAS (ACTUALIZACIÓN DINÁMICA DE DATOS) -->
         <section id="metrics" class="page-view hidden py-16">
             <div class="max-w-6xl mx-auto px-6">
                 <div class="text-center max-w-3xl mx-auto mb-12">
@@ -309,8 +337,8 @@
 
                 <!-- Buscador de Dominio Interactivo -->
                 <div class="max-w-xl mx-auto bg-slate-900 p-2 rounded-xl border border-slate-800 flex gap-2 mb-10 shadow-xl">
-                    <input id="domain-input" type="text" placeholder="Ingresa un dominio para analizar (ej: miempresa.com)" class="bg-transparent px-4 py-2.5 text-sm text-white focus:outline-none flex-grow">
-                    <button onclick="updateDomain()" class="bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm px-5 py-2.5 rounded-lg transition flex items-center gap-2">
+                    <input id="domain-input" type="text" placeholder="Ingresa un dominio (ej: google.com)" class="bg-transparent px-4 py-2.5 text-sm text-white focus:outline-none flex-grow">
+                    <button id="update-btn" onclick="updateDomain()" class="bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm px-5 py-2.5 rounded-lg transition flex items-center gap-2">
                         <i class="fa-solid fa-rotate"></i> Actualizar
                     </button>
                 </div>
@@ -323,10 +351,10 @@
                             <h4 id="display-domain" class="text-2xl font-bold text-white mt-1">midominio.com</h4>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5">
-                                <i class="fa-solid fa-circle text-[8px] animate-pulse"></i> Salud Web: 92/100
+                            <span id="metric-health" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5">
+                                Salud Web: 92/100
                             </span>
-                            <span class="bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-full">
+                            <span id="metric-dr" class="bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-full">
                                 Autoridad: DR 68
                             </span>
                         </div>
@@ -336,21 +364,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                         <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
                             <div class="text-xs text-slate-400 mb-1">Tráfico Orgánico Est.</div>
-                            <div class="text-3xl font-extrabold text-white">14,250</div>
+                            <div id="metric-traffic" class="text-3xl font-extrabold text-white">14,250</div>
                             <div class="text-xs text-emerald-400 mt-2 font-medium flex items-center gap-1">
                                 <i class="fa-solid fa-arrow-trend-up"></i> +12% este mes
                             </div>
                         </div>
                         <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
                             <div class="text-xs text-slate-400 mb-1">Keywords Posicionadas</div>
-                            <div class="text-3xl font-extrabold text-white">1,840</div>
+                            <div id="metric-keywords" class="text-3xl font-extrabold text-white">1,840</div>
                             <div class="text-xs text-emerald-400 mt-2 font-medium flex items-center gap-1">
                                 <i class="fa-solid fa-circle-plus"></i> +85 nuevas
                             </div>
                         </div>
                         <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
                             <div class="text-xs text-slate-400 mb-1">Leads Captados CRM</div>
-                            <div class="text-3xl font-extrabold text-white">320</div>
+                            <div id="metric-leads" class="text-3xl font-extrabold text-white">320</div>
                             <div class="text-xs text-amber-400 mt-2 font-medium flex items-center gap-1">
                                 <i class="fa-solid fa-bullseye"></i> 2.8% conversión
                             </div>
@@ -364,42 +392,40 @@
                         </div>
                     </div>
 
-                    <!-- Gráfico Visual de Crecimiento & Tabla de Palabras Clave -->
+                    <!-- Gráfico Visual y Tabla -->
                     <div class="grid md:grid-cols-2 gap-8 pt-4">
-                        <!-- Gráfico de barras visual -->
                         <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
                             <h5 class="text-sm font-bold text-white mb-6 flex items-center gap-2">
                                 <i class="fa-solid fa-chart-simple text-orange-500"></i> Evolución de Tráfico (Últimos 6 Meses)
                             </h5>
                             <div class="flex items-end justify-between h-40 gap-3 pt-6 border-b border-slate-800 pb-2">
                                 <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
-                                    <div class="w-full bg-orange-500/40 rounded-t group-hover:bg-orange-500 transition" style="height: 45%;"></div>
+                                    <div class="chart-bar w-full bg-orange-500/40 rounded-t group-hover:bg-orange-500 transition duration-500" style="height: 45%;"></div>
                                     <span class="text-[10px] text-slate-500 mt-2">Mayo</span>
                                 </div>
                                 <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
-                                    <div class="w-full bg-orange-500/50 rounded-t group-hover:bg-orange-500 transition" style="height: 58%;"></div>
+                                    <div class="chart-bar w-full bg-orange-500/50 rounded-t group-hover:bg-orange-500 transition duration-500" style="height: 58%;"></div>
                                     <span class="text-[10px] text-slate-500 mt-2">Junio</span>
                                 </div>
                                 <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
-                                    <div class="w-full bg-orange-500/60 rounded-t group-hover:bg-orange-500 transition" style="height: 65%;"></div>
+                                    <div class="chart-bar w-full bg-orange-500/60 rounded-t group-hover:bg-orange-500 transition duration-500" style="height: 65%;"></div>
                                     <span class="text-[10px] text-slate-500 mt-2">Julio</span>
                                 </div>
                                 <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
-                                    <div class="w-full bg-orange-500/75 rounded-t group-hover:bg-orange-500 transition" style="height: 78%;"></div>
+                                    <div class="chart-bar w-full bg-orange-500/75 rounded-t group-hover:bg-orange-500 transition duration-500" style="height: 78%;"></div>
                                     <span class="text-[10px] text-slate-500 mt-2">Ago</span>
                                 </div>
                                 <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
-                                    <div class="w-full bg-orange-500/90 rounded-t group-hover:bg-orange-500 transition" style="height: 88%;"></div>
+                                    <div class="chart-bar w-full bg-orange-500/90 rounded-t group-hover:bg-orange-500 transition duration-500" style="height: 88%;"></div>
                                     <span class="text-[10px] text-slate-500 mt-2">Sept</span>
                                 </div>
                                 <div class="w-full bg-slate-900 rounded-t flex flex-col justify-end items-center group relative h-full">
-                                    <div class="w-full bg-orange-500 rounded-t shadow-lg shadow-orange-500/20" style="height: 100%;"></div>
+                                    <div class="chart-bar w-full bg-orange-500 rounded-t shadow-lg shadow-orange-500/20 transition duration-500" style="height: 100%;"></div>
                                     <span class="text-[10px] text-orange-400 font-bold mt-2">Oct</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Tabla de Palabras Clave Clave -->
                         <div class="bg-slate-950 p-6 rounded-xl border border-slate-800">
                             <h5 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
                                 <i class="fa-solid fa-key text-amber-400"></i> Top Palabras Clave Posicionadas
@@ -460,7 +486,7 @@
                     <div class="bg-slate-900 border-2 border-orange-500 p-8 rounded-2xl flex flex-col justify-between relative shadow-2xl shadow-orange-500/10">
                         <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-bold uppercase">Más Popular</span>
                         <div>
-                            <h3 class="text-xl font-bold text-white mb-2">GrowthPro</h3>
+                            <h3 class="text-xl font-bold text-white mb-2">Growth Pro</h3>
                             <p class="text-slate-400 text-sm mb-6">Perfecto para pequeñas agencias y empresas en crecimiento.</p>
                             <div class="text-4xl font-extrabold text-white mb-6">$79 <span class="text-sm font-normal text-slate-400">/mes</span></div>
                             <ul class="space-y-3 text-sm text-slate-300 mb-8">
@@ -561,10 +587,9 @@
         </div>
     </div>
 
-    <!-- PIE DE PÁGINA (MEJORADO EN 4 COLUMNAS) -->
+    <!-- PIE DE PÁGINA (4 COLUMNAS) -->
     <footer class="border-t border-slate-800 bg-slate-950 text-slate-400 pt-16 pb-12 text-sm mt-auto">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10">
-            <!-- Columna 1: Marca & Info -->
             <div class="space-y-4">
                 <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
                     <div class="bg-orange-500 p-2 rounded-lg text-white font-bold text-xl flex items-center justify-center w-8 h-8">
@@ -582,7 +607,6 @@
                 </div>
             </div>
 
-            <!-- Columna 2: Navegación -->
             <div>
                 <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-4">Plataforma</h4>
                 <ul class="space-y-2.5 text-xs">
@@ -593,7 +617,6 @@
                 </ul>
             </div>
 
-            <!-- Columna 3: Soluciones -->
             <div>
                 <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-4">Soluciones</h4>
                 <ul class="space-y-2.5 text-xs text-slate-400">
@@ -604,7 +627,6 @@
                 </ul>
             </div>
 
-            <!-- Columna 4: Estado y Legal -->
             <div>
                 <h4 class="text-white font-bold text-xs uppercase tracking-wider mb-4">Infraestructura</h4>
                 <div class="space-y-3 text-xs">
