@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
-        // Estado de autenticación mediante localStorage
         let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -20,7 +19,7 @@
                 const userEmail = localStorage.getItem('userEmail') || 'Usuario';
                 authButtons.innerHTML = `
                     <span class="text-xs text-slate-400 hidden sm:inline"><i class="fa-solid fa-user text-orange-500 mr-1"></i> ${userEmail}</span>
-                    <button onclick="logout()" class="text-sm hover:text-white text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg hover:border-slate-500 transition">Cerrar Sesión</button>
+                    <button onclick="openModal('modal-logout')" class="text-sm hover:text-white text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg hover:border-slate-500 transition">Cerrar Sesión</button>
                 `;
             } else {
                 authButtons.innerHTML = `
@@ -55,6 +54,7 @@
         function openModal(modalId) {
             closeModal('modal-login');
             closeModal('modal-register');
+            closeModal('modal-logout');
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.remove('hidden');
@@ -78,7 +78,6 @@
             localStorage.setItem('userEmail', email);
             updateAuthUI();
             closeModal('modal-login');
-            alert('¡Sesión iniciada con éxito! Ya puedes contratar tu plan.');
         }
 
         function handleRegister(event) {
@@ -89,21 +88,19 @@
             localStorage.setItem('userEmail', email);
             updateAuthUI();
             closeModal('modal-register');
-            alert('¡Cuenta creada e iniciada con éxito! Ya puedes contratar tu plan.');
         }
 
-        function logout() {
+        function confirmLogout() {
             isLoggedIn = false;
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userEmail');
             updateAuthUI();
-            alert('Has cerrado sesión correctamente.');
+            closeModal('modal-logout');
         }
 
         function checkout(stripeUrl) {
             if (!isLoggedIn) {
-                alert('Debes iniciar sesión o registrarte antes de poder realizar el pago.');
-                openModal('modal-login');
+                openModal('modal-register');
             } else {
                 window.open(stripeUrl, '_blank');
             }
@@ -130,7 +127,7 @@
             </nav>
 
             <div id="auth-buttons" class="flex items-center gap-4">
-                <!-- Generado dinámicamente según sesión -->
+                <!-- Generado dinámicamente -->
             </div>
         </div>
     </header>
@@ -337,7 +334,7 @@
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative shadow-2xl">
             <button onclick="closeModal('modal-register')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             <h3 class="text-2xl font-bold text-white mb-2">Comenzar Prueba Gratis</h3>
-            <p class="text-slate-400 text-sm mb-6">Disfruta de 14 días sin compromiso.</p>
+            <p class="text-slate-400 text-sm mb-6">Crea tu cuenta para continuar con la contratación.</p>
             <form onsubmit="handleRegister(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">Nombre Completo</label>
@@ -356,6 +353,22 @@
             <div class="mt-4 pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
                 ¿Ya tienes una cuenta? 
                 <button onclick="openModal('modal-login')" class="text-orange-400 hover:text-orange-300 font-semibold ml-1">Inicia sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIRMAR CERRAR SESIÓN -->
+    <div id="modal-logout" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl p-6 relative shadow-2xl text-center">
+            <button onclick="closeModal('modal-logout')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="w-12 h-12 bg-orange-500/10 text-orange-400 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">¿Quieres cerrar sesión?</h3>
+            <p class="text-slate-400 text-sm mb-6">Tendrás que volver a iniciar sesión para acceder a las opciones de pago.</p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('modal-logout')" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 rounded-lg transition text-sm">Cancelar</button>
+                <button onclick="confirmLogout()" class="w-1/2 bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 rounded-lg transition text-sm">Cerrar Sesión</button>
             </div>
         </div>
     </div>
